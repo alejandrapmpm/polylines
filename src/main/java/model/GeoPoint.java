@@ -3,8 +3,8 @@ package model;
 import java.util.Objects;
 
 public class GeoPoint {
-    private final double lat;
-    private final double lng;
+    public final double lat;
+    public final double lng;
 
     public GeoPoint(double lat, double lng) {
 
