@@ -1,21 +1,26 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
+import clock.Clock;
 import model.GeoPoint;
 import model.Robot;
 import utilities.DistanceCalculator;
 
 public class RobotMovementService {
 
-    public Robot robot;
+    public final Robot robot;
     public int nextPosition;
+    private final Clock clock;
 
-    public RobotMovementService(EncodedPolyline encodedPolyline) {
+    public RobotMovementService(EncodedPolyline encodedPolyline, Double meters, Clock clock) {
         this.robot = new Robot(map(encodedPolyline.decodePath()));
         this.nextPosition = 1;
+        this.clock = clock;
+        this.clock.addTask(() -> moveRobot(meters));
     }
 
     private List<GeoPoint> map(List<LatLng> decodePath) {
@@ -27,6 +32,7 @@ public class RobotMovementService {
     }
 
     public void moveRobot(double metersToMove) {
+        System.out.println("Im moving: " + LocalDateTime.now());
         if (notYetAtTheEnd(robot.currentPosition)) {
             GeoPoint to = robot.journey.get(nextPosition);
             while (metersToMove > 0 && notYetAtTheEnd(robot.currentPosition)) {
