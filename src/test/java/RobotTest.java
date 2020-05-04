@@ -4,21 +4,30 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import org.junit.Test;
 import org.mockito.Mockito;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
 import clock.ManualClock;
 import model.GeoPoint;
+import reporting.Report;
+import service.ParticleReader;
+import reporting.ReportGenerator;
 import service.RobotMovementService;
 import utilities.DistanceCalculator;
 
 public class RobotTest {
 
-    private ManualClock timer = new ManualClock();
+    private ManualClock movementTimer = new ManualClock();
     private static final double METERS_TO_MOVE = 50d;
     private EncodedPolyline encoder = Mockito.mock(EncodedPolyline.class);
+    private ParticleReader particleReader = new ParticleReader();
+
 
     //ToDO handle empty or wrong polyline
     @Test
@@ -26,7 +35,7 @@ public class RobotTest {
 
         when(encoder.decodePath()).thenReturn(singletonList(new LatLng(41.84888, -87.63860)));
 
-        new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
 
         verify(encoder).decodePath();
     }
@@ -38,7 +47,7 @@ public class RobotTest {
                 new LatLng(41.84856, -87.63831));
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
 
         assertEquals(new GeoPoint(41.84888, -87.63860), robotMovementService.robot.currentPosition);
     }
@@ -49,7 +58,7 @@ public class RobotTest {
         List<LatLng> points = singletonList(new LatLng(41.84888, -87.63860));
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(1);
 
         assertEquals(new GeoPoint(41.84888, -87.63860),
@@ -64,7 +73,7 @@ public class RobotTest {
                 new LatLng(41.84856, -87.63831)); //this two points are 42.9 meters far from each other
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(20);
 
         assertEquals(new GeoPoint(41.84873092479406, -87.63846490059463),
@@ -80,7 +89,7 @@ public class RobotTest {
                 new LatLng(41.84856, -87.63831)); //these two points are 42.9 meters far from each other
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(43);
 
         assertEquals(new GeoPoint(41.84856, -87.63831),
@@ -99,7 +108,7 @@ public class RobotTest {
         double distance = DistanceCalculator.distance(new GeoPoint(41.84888, -87.63860),
                 new GeoPoint(41.84856, -87.63831)); //Not sure how I feel about this- Maybe its easier to mock this utilityg
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(distance);
 
         assertEquals(new GeoPoint(41.84856, -87.63831),
@@ -121,7 +130,7 @@ public class RobotTest {
                 );
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(1000);
 
         assertEquals(new GeoPoint(41.84906, -87.63693),
@@ -132,7 +141,7 @@ public class RobotTest {
     @Test
     public void movingTwiceTheRobot_shouldKeepState(){
 
-/*          String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+        /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
             Distance is: 58.59883353809855
             Distance is: 87.86280526271533*/
@@ -145,7 +154,7 @@ public class RobotTest {
         );
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
         robotMovementService.moveRobot(40);
 
         assertEquals(new GeoPoint(41.84858184958813, -87.63832980118924),
@@ -175,10 +184,9 @@ public class RobotTest {
         );
         when(encoder.decodePath()).thenReturn(points);
 
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, timer);
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, movementTimer, particleReader);
 
-        timer.start();
-        timer.elapseTime();
+        fireTimer(movementTimer);
 
         assertEquals(new GeoPoint(41.84861669507057, -87.63827139910089),
                 robotMovementService.robot.currentPosition);
@@ -186,4 +194,117 @@ public class RobotTest {
 
     }
 
+    @Test
+    public void every100MetersShouldReadParticles(){
+
+        /*String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+        *   Distance is: 42.93135105797141
+            Distance is: 58.59883353809855
+            Distance is: 87.86280526271533
+        * */
+        List<LatLng> points = asList(
+                new LatLng(41.84888, -87.63860000000001),
+                new LatLng(41.84856, -87.63831),
+                new LatLng(41.84903, -87.63799),
+                new LatLng(41.84906, -87.63693)
+        );
+        when(encoder.decodePath()).thenReturn(points);
+
+
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, 300d, movementTimer, particleReader);
+
+        fireTimer(movementTimer);
+
+        assertEquals(1, particleReader.values.size());
+        System.out.println("Delta moved: " + robotMovementService.metersMoved);
+
+    }
+
+
+    @Test
+    public void every15MinShouldGenerateAReportOfParticles() throws IOException {
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+
+        mockSystemOut(outContent, errContent);
+
+        List<LatLng> points = asList(
+                new LatLng(41.84888, -87.63860000000001),
+                new LatLng(41.84856, -87.63831),
+                new LatLng(41.84903, -87.63799),
+                new LatLng(41.84906, -87.63693)
+        );
+        when(encoder.decodePath()).thenReturn(points);
+
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, 300d, movementTimer, particleReader);
+
+        ManualClock reportTimer = new ManualClock();
+        new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
+        fireTimer(movementTimer);
+        fireTimer(reportTimer);
+
+        Report report = mapWrittenOutputToReport(outContent);
+
+        assertEquals("LEVEL", report.level);
+        assertEquals("ROBOT", report.source);
+        assertEquals(41.84906d, report.location.lat, 0.00001);
+        assertEquals(-87.63693d, report.location.lng, 0.00001);
+
+        leaveSystemOutAsItWasBefore(originalOut, originalErr);
+    }
+
+    @Test
+    public void whenNoParticlesRead_AverageIsStillZero() throws IOException {
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+
+        mockSystemOut(outContent, errContent);
+
+        List<LatLng> points = singletonList(
+                new LatLng(41.84888, -87.63860000000001)
+        );
+        when(encoder.decodePath()).thenReturn(points);
+
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, 2d, movementTimer, new ParticleReader());
+
+        ManualClock reportTimer = new ManualClock();
+        new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
+
+        fireTimer(reportTimer);
+
+        Report report = mapWrittenOutputToReport(outContent);
+
+        //TODO assertEquals(average, report.level);
+        assertEquals("ROBOT", report.source);
+        assertEquals(41.84888d, report.location.lat, 0.00001);
+        assertEquals(-87.63860d, report.location.lng, 0.00001);
+
+        leaveSystemOutAsItWasBefore(originalOut, originalErr);
+    }
+
+    private Report mapWrittenOutputToReport(ByteArrayOutputStream outContent) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(outContent.toString(), Report.class);
+    }
+
+    private void leaveSystemOutAsItWasBefore(PrintStream originalOut, PrintStream originalErr) {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+    }
+
+    private void mockSystemOut(ByteArrayOutputStream outContent, ByteArrayOutputStream errContent) {
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
+    }
+
+    private void fireTimer(ManualClock reportTimer) {
+        reportTimer.start();
+        reportTimer.elapseTime();
+    }
 }

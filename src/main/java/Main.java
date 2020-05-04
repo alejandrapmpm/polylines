@@ -2,6 +2,8 @@ import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
 import clock.Clock;
 import clock.RealClock;
+import reporting.ReportGenerator;
+import service.ParticleReader;
 import service.RobotMovementService;
 
 public class Main {
@@ -19,8 +21,13 @@ public class Main {
         );*/
         EncodedPolyline encoder = new EncodedPolyline(polyline);
         //robotMovementService.moveRobot(40);
-        Clock timer = new RealClock(5000, TimeUnit.MILLISECONDS);
-        new RobotMovementService(encoder, 40d, timer);
+        Clock timer = new RealClock(1000, TimeUnit.MILLISECONDS);
+        ParticleReader particleReader = new ParticleReader();
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, 50d, timer, particleReader);
         timer.start();
+
+        Clock reportTimer = new RealClock(5000, TimeUnit.MILLISECONDS);
+        ReportGenerator reportGenerator = new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
+        reportTimer.start();
     }
 }

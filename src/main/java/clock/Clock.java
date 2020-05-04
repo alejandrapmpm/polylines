@@ -7,4 +7,5 @@ public interface Clock {
     interface Task {
         void perform();
     }
+
 }
