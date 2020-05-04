@@ -9,6 +9,5 @@ public class Robot {
     public Robot(List<GeoPoint> journey) {
         this.journey = journey;
         currentPosition = journey.get(0);
-        currentPosition.visited = true;
     }
 }

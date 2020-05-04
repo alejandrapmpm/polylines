@@ -1,7 +1,6 @@
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -137,6 +136,44 @@ public class RobotTest {
 
         assertEquals(new GeoPoint(41.84906, -87.63693),
                 robotMovementService.robot.currentPosition);
-        assertTrue(robotMovementService.robot.journey.stream().allMatch(GeoPoint::isVisited));
     }
+
+
+    @Test
+    public void movingTwiceTheRobot_shouldKeepState(){
+
+        //String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+        //[GeoPoint{lat=41.84888, lng=-87.63860000000001},
+        // GeoPoint{lat=41.848560000000006, lng=-87.63831},
+        // GeoPoint{lat=41.849030000000006, lng=-87.63799},
+        // GeoPoint{lat=41.84906, lng=-87.63693}]
+        /*
+        *   Distance is: 42.93135105797141
+            Distance is: 58.59883353809855
+            Distance is: 87.86280526271533
+        * */
+        EncodedPolyline encoder = Mockito.mock(EncodedPolyline.class);
+
+        List<LatLng> points = asList(
+                new LatLng(41.84888, -87.63860000000001),
+                new LatLng(41.84856, -87.63831),
+                new LatLng(41.84903, -87.63799),
+                new LatLng(41.84906, -87.63693)
+        );
+        when(encoder.decodePath()).thenReturn(points);
+
+        RobotMovementService robotMovementService = new RobotMovementService(encoder);
+        robotMovementService.moveRobot(40);
+
+        assertEquals(new GeoPoint(41.84858184958813, -87.63832980118924),
+                robotMovementService.robot.currentPosition);
+        assertEquals(1, robotMovementService.nextPosition);
+
+        robotMovementService.moveRobot(100);
+
+        assertEquals(new GeoPoint(41.84904313518723, -87.6375258900511),
+                robotMovementService.robot.currentPosition);
+        assertEquals(3, robotMovementService.nextPosition);
+    }
+
 }
