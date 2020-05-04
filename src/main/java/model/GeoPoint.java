@@ -5,6 +5,7 @@ import java.util.Objects;
 public class GeoPoint {
     public final double lat;
     public final double lng;
+    public boolean visited;
 
     public GeoPoint(double lat, double lng) {
 
@@ -36,5 +37,9 @@ public class GeoPoint {
     @Override
     public int hashCode() {
         return Objects.hash(lat, lng);
+    }
+
+    public boolean isVisited() {
+        return visited;
     }
 }

@@ -10,22 +10,12 @@ import utilities.DistanceCalculator;
 
 public class RobotMovementService {
 
-    private EncodedPolyline encoder;
     public Robot robot;
     private int nextPosition;
-    private List<GeoPoint> journey;
 
     public RobotMovementService(EncodedPolyline encodedPolyline) {
-        this.encoder = encodedPolyline;
-        journey = map(encoder.decodePath());
-        this.robot = new Robot(journey.get(0));
+        this.robot = new Robot(map(encodedPolyline.decodePath()));
         this.nextPosition = 1;
-    }
-
-    public List<GeoPoint> decode() {
-        List<GeoPoint> points = map(encoder.decodePath());
-        System.out.println("Decoded: " + points);
-        return points;
     }
 
     private List<GeoPoint> map(List<LatLng> decodePath) {
@@ -37,14 +27,25 @@ public class RobotMovementService {
     }
 
     public void moveRobot(double meters) {
-        GeoPoint to = journey.get(nextPosition);
-        double trip = DistanceCalculator.distance(robot.currentPosition, to);
-        System.out.println("Trip: " + trip);
-
-        if (trip > meters) {
-            robot.currentPosition = DistanceCalculator.moveGeoPointSomeMeters(robot.currentPosition, to, meters);
-        } else if (trip < meters) {
-            robot.currentPosition = journey.get(nextPosition);
+        GeoPoint from = robot.currentPosition;
+        if (from != robot.journey.get(robot.journey.size() - 1)) {
+            GeoPoint to = robot.journey.get(nextPosition);
+            while (meters > 0 && nextPosition < robot.journey.size()) {
+                double trip = DistanceCalculator.distance(robot.currentPosition, to);
+                if (trip > meters) {
+                    robot.currentPosition = DistanceCalculator.moveGeoPointSomeMeters(robot.currentPosition, to, meters);
+                    meters = 0;
+                } else if (trip <= meters) {
+                    meters = meters - trip;
+                    robot.currentPosition = robot.journey.get(nextPosition);
+                    robot.journey.get(nextPosition).visited = true;
+                    nextPosition++;
+                    if (nextPosition < robot.journey.size()) {
+                        to = robot.journey.get(nextPosition);
+                    }
+                }
+            }
+            System.out.println("I've finished moving " + robot.currentPosition + " to: " + to);
         }
     }
 }
