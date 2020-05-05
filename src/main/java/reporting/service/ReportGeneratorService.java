@@ -6,7 +6,7 @@ import model.Robot;
 import reporting.model.Location;
 import reporting.model.Report;
 import reporting.printer.ReportPrinter;
-import service.ParticleReader;
+import app.ParticleReader;
 
 public class ReportGeneratorService {
 

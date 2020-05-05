@@ -1,53 +1,25 @@
-package service;
+package app;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import com.google.maps.model.EncodedPolyline;
-import com.google.maps.model.LatLng;
-import clock.Timer;
 import model.GeoPoint;
 import model.Robot;
 import utilities.DistanceCalculator;
 
-public class RobotMovementService {
+public class RobotApplication {
 
     public final Robot robot;
     private final ParticleReader particleReader;
-    public int nextPosition;
-    public double metersMoved;
-    private final double speed;
+    public GeoPoint currentPosition;
+    public int nextPosition = 1;
+    public double metersMoved = 0;
 
-    public RobotMovementService(EncodedPolyline encoder, double speed, ParticleReader particleReader) {
-        this.robot = new Robot(map(encoder.decodePath()));
-        this.nextPosition = 1;
+    public RobotApplication(Robot robot, ParticleReader particleReader) {
+        this.robot = robot;
         this.particleReader = particleReader;
-        this.metersMoved = 0;
-        this.speed = speed;
-    }
-
-    private List<GeoPoint> map(List<LatLng> decodePath) {
-        return decodePath.stream().map(this::newGeoPoint).collect(Collectors.toList());
-    }
-
-    private <R> GeoPoint newGeoPoint(LatLng latLng) {
-        return new GeoPoint(latLng.lat, latLng.lng);
-    }
-
-    private void moveToIntermediateGeoPoint(double metersToMove, GeoPoint to) {
-        robot.currentPosition = DistanceCalculator.moveGeoPointSomeMeters(robot.currentPosition, to, metersToMove);
-    }
-
-    private void moveToNextGeoPoint() {
-        robot.currentPosition = robot.journey.get(nextPosition);
-        nextPosition++;
-    }
-
-    private boolean notYetAtTheEnd(GeoPoint from) {
-        return from != robot.journey.get(robot.journey.size() - 1);
+        currentPosition = robot.journey.get(0);
     }
 
     public void moveRobot() {
-        double remainingMeters = speed;
+        double remainingMeters = robot.speed;
         if (notYetAtTheEnd(robot.currentPosition)) {
             GeoPoint to = robot.journey.get(nextPosition);
             while (remainingMeters > 0 && notYetAtTheEnd(robot.currentPosition)) {
@@ -72,5 +44,18 @@ public class RobotMovementService {
             }
             //System.out.println("I've finished moving " + robot.currentPosition + " to: " + to);
         }
+    }
+
+    private void moveToIntermediateGeoPoint(double metersToMove, GeoPoint to) {
+        robot.currentPosition = DistanceCalculator.moveGeoPointSomeMeters(robot.currentPosition, to, metersToMove);
+    }
+
+    private void moveToNextGeoPoint() {
+        robot.currentPosition = robot.journey.get(nextPosition);
+        nextPosition++;
+    }
+
+    private boolean notYetAtTheEnd(GeoPoint from) {
+        return from != robot.journey.get(robot.journey.size() - 1);
     }
 }
