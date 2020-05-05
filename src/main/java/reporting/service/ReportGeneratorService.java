@@ -1,4 +1,4 @@
-package reporting;
+package reporting.service;
 
 import java.util.Date;
 import model.Level;
@@ -20,22 +20,31 @@ public class ReportGeneratorService {
         this.printer = printer;
     }
 
-    void generate() {
+    public void generate() {
         printer.printReport(buildReport());
     }
 
     private Report buildReport() {
-        Integer sum = particleReader.values.stream().reduce(0, Integer::sum);
-        int size = particleReader.values.size();
-        int average = size > 0 ? sum / size : 0;
         return new Report(
-                new Date().getTime(),
-                new Location(robot.currentPosition.lat, robot.currentPosition.lng),
-                getLevel(average),
+                getCurrentTimestamp(),
+                getRobotLocation(),
+                getLevel(),
                 robot.source);
     }
 
-    private Level getLevel(int average) {
+    private long getCurrentTimestamp() {
+        return new Date().getTime();
+    }
+
+    private Location getRobotLocation() {
+        return new Location(robot.currentPosition.lat, robot.currentPosition.lng);
+    }
+
+    private Level getLevel() {
+        double average = particleReader.values.stream()
+                .mapToInt(i -> i)
+                .average()
+                .orElse(0d);
         if (average >= 0 && average <= 50) {
             return Level.Good;
         } else if (average <= 100) {

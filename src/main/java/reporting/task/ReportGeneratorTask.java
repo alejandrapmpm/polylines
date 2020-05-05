@@ -1,6 +1,7 @@
-package reporting;
+package reporting.task;
 
 import clock.Timer;
+import reporting.service.ReportGeneratorService;
 
 public class ReportGeneratorTask {
 
