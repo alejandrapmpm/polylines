@@ -13,4 +13,8 @@ public class Robot {
         this.source = "ROBOT";
         currentPosition = journey.get(0);
     }
+
+    public boolean atTheEndOfTheJourney(){
+        return currentPosition.equals(journey.get(journey.size() - 1));
+    }
 }

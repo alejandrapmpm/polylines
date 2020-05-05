@@ -29,12 +29,4 @@ public class DistanceCalculator {
     private static double haversin(double val) {
         return Math.pow(Math.sin(val / 2), 2);
     }
-
-    //TODO dont like this method here
-    public static GeoPoint moveGeoPointSomeMeters(GeoPoint from, GeoPoint to, double meters) {
-        double radio = meters / calculate(from, to);
-        double newLat = from.lat + (to.lat - from.lat) * radio;
-        double newLng = from.lng + (to.lng - from.lng) * radio;
-        return new GeoPoint(newLat, newLng);
-    }
 }
