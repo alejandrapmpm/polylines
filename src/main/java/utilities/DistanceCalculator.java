@@ -20,13 +20,13 @@ public class DistanceCalculator {
         startLat = Math.toRadians(startLat);
         endLat = Math.toRadians(endLat);
 
-        double a = haversin(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversin(dLong);
+        double a = haversine(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversine(dLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return EARTH_RADIUS * c;
     }
 
-    private static double haversin(double val) {
+    private static double haversine(double val) {
         return Math.pow(Math.sin(val / 2), 2);
     }
 }

@@ -9,7 +9,7 @@ public class RobotApplication {
     private final Robot robot;
     private final ParticleReader particleReader;
     public int nextPosition = 1;
-    public double metersAlreadyMoved = 0;
+    private double metersAlreadyMoved = 0;
 
     public RobotApplication(Robot robot, ParticleReader particleReader) {
         this.robot = robot;

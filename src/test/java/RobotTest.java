@@ -36,7 +36,7 @@ public class RobotTest {
     private EncodedPolyline encoder;
     private static final double METERS_TO_MOVE = 50d;
     private static final String ROBOT_SOURCE_NAME = "ROBOT";
-    private GeoPointMapper mapper = new GeoPointMapper();
+    private final GeoPointMapper mapper = new GeoPointMapper();
 
 
     @Before

@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class ParticleReader {
 
-    public List<Integer> values = new ArrayList<>();
+    public final List<Integer> values = new ArrayList<>();
     private final Random random;
 
     public ParticleReader() {
@@ -15,7 +15,7 @@ public class ParticleReader {
 
     public void run() {
         values.add(generateRandomInt());
-        //System.out.println("Generating particula:" + values);
+        //System.out.println("Generating particles:" + values);
     }
 
     public int generateRandomInt() {
