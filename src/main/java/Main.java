@@ -41,6 +41,15 @@ public class Main {
 
         robotScheduler.start();
         reportingScheduler.start();
+
+        shutdownSchedulerIfRobotFinishedJourney(robot, robotScheduler, reportingScheduler);
+    }
+
+    private static void shutdownSchedulerIfRobotFinishedJourney(Robot robot, Scheduler robotScheduler, Scheduler reportingScheduler) {
+        if(!robot.notArrivedYet()){
+            robotScheduler.stop();
+            reportingScheduler.stop();
+        }
     }
 
     private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {

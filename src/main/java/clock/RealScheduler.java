@@ -29,6 +29,10 @@ public class RealScheduler implements Scheduler {
     public void start() {
         scheduler.scheduleAtFixedRate(this::performTask, period, period, periodTimeUnit);
     }
+    @Override
+    public void stop() {
+        scheduler.shutdown();
+    }
 
     private void performTask() {
         tasks.forEach(Task::perform);

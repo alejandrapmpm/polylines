@@ -17,6 +17,11 @@ public class ManualScheduler implements Scheduler {
         // Nothing to do
     }
 
+    @Override
+    public void stop() {
+        //Nothing to do
+    }
+
     public void elapseTime(){
         tasks.forEach(Task::perform);
     }
