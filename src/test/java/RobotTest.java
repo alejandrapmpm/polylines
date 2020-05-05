@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import clock.ManualScheduler;
+import scheduler.ManualScheduler;
 import model.GeoPoint;
 import model.Level;
 import model.Robot;

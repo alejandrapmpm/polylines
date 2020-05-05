@@ -1,4 +1,4 @@
-package clock;
+package scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,14 @@ import java.util.concurrent.TimeUnit;
 public class RealScheduler implements Scheduler {
 
     private final long period;
+    private final long initialDelay;
     private final TimeUnit periodTimeUnit;
     private final List<Task> tasks;
     private final ScheduledExecutorService scheduler;
 
-    public RealScheduler(long period, TimeUnit periodTimeUnit) {
+    public RealScheduler(long period, long initialDelay, TimeUnit periodTimeUnit) {
         this.period = period;
+        this.initialDelay = initialDelay;
         this.periodTimeUnit = periodTimeUnit;
         this.tasks = new ArrayList<>();
         this.scheduler =  Executors.newSingleThreadScheduledExecutor();
@@ -27,7 +29,7 @@ public class RealScheduler implements Scheduler {
 
     @Override
     public void start() {
-        scheduler.scheduleAtFixedRate(this::performTask, period, period, periodTimeUnit);
+        scheduler.scheduleAtFixedRate(this::performTask, initialDelay, period, periodTimeUnit);
     }
     @Override
     public void stop() {

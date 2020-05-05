@@ -47,7 +47,7 @@ public class ReportGeneratorService {
         double average = particleReader.values.stream()
                 .mapToInt(i -> i)
                 .average()
-                .orElse(0d);
+                .orElse(0);
         if (average >= 0 && average <= 50) {
             return Level.Good;
         } else if (average <= 100) {

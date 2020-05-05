@@ -1,4 +1,4 @@
-package clock;
+package scheduler;
 
 public interface Scheduler {
 

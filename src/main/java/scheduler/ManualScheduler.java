@@ -1,4 +1,4 @@
-package clock;
+package scheduler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,7 +15,7 @@ public class ParticleReader {
 
     public void run() {
         values.add(generateRandomInt());
-        //System.out.println("Generating particles:" + values);
+        System.out.println("Generating particles:" + values);
     }
 
     public int generateRandomInt() {
