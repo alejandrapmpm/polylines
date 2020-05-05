@@ -1,4 +1,4 @@
-package reporting;
+package reporting.model;
 
 import model.Level;
 
@@ -12,7 +12,7 @@ public class Report {
     public Report() {
     }
 
-    Report(long timestamp, Location location, Level level, String source) {
+    public Report(long timestamp, Location location, Level level, String source) {
         this.timestamp = timestamp;
         this.location = location;
         this.level = level;

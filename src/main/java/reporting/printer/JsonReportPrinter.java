@@ -2,9 +2,9 @@ package reporting.printer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reporting.Report;
+import reporting.model.Report;
 
-public class ConsoleReportPrinter implements ReportPrinter {
+public class JsonReportPrinter implements ReportPrinter {
 
     @Override
     public void printReport(Report report) {

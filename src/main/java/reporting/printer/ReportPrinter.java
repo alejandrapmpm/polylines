@@ -1,6 +1,6 @@
 package reporting.printer;
 
-import reporting.Report;
+import reporting.model.Report;
 
 public interface ReportPrinter {
 

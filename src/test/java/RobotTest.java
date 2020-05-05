@@ -17,9 +17,10 @@ import com.google.maps.model.LatLng;
 import clock.ManualTimer;
 import model.GeoPoint;
 import model.Level;
-import reporting.Report;
-import reporting.ReportGenerator;
-import reporting.printer.ConsoleReportPrinter;
+import reporting.model.Report;
+import reporting.ReportGeneratorService;
+import reporting.ReportGeneratorTask;
+import reporting.printer.JsonReportPrinter;
 import service.ParticleReader;
 import service.RobotMovementService;
 import utilities.DistanceCalculator;
@@ -250,7 +251,8 @@ public class RobotTest {
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 300d, robotTimer, spyParticleReader);
         ManualTimer reportTimer = new ManualTimer();
 
-        new ReportGenerator(robotMovementService.robot, spyParticleReader, reportTimer, new ConsoleReportPrinter());
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robotMovementService.robot, spyParticleReader, new JsonReportPrinter());
+        ReportGeneratorTask reportGeneratorTask = new ReportGeneratorTask(reportTimer, reportGeneratorService);
 
         fireTimer(robotTimer);
         fireTimer(reportTimer);
@@ -285,7 +287,9 @@ public class RobotTest {
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 2d, robotTimer, new ParticleReader());
 
         ManualTimer reportTimer = new ManualTimer();
-        new ReportGenerator(robotMovementService.robot, particleReader, reportTimer, new ConsoleReportPrinter());
+
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robotMovementService.robot, particleReader, new JsonReportPrinter());
+        ReportGeneratorTask reportGeneratorTask = new ReportGeneratorTask(reportTimer, reportGeneratorService);
 
         fireTimer(reportTimer);
 

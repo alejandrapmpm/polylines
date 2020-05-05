@@ -1,31 +1,27 @@
 package reporting;
 
 import java.util.Date;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import clock.Timer;
 import model.Level;
 import model.Robot;
+import reporting.model.Location;
+import reporting.model.Report;
 import reporting.printer.ReportPrinter;
 import service.ParticleReader;
 
-public class ReportGenerator {
+public class ReportGeneratorService {
+
     private final Robot robot;
     private final ParticleReader particleReader;
     private final ReportPrinter printer;
 
-    public ReportGenerator(Robot robot, ParticleReader particleReader, Timer reportTimer, ReportPrinter printer) {
-
+    public ReportGeneratorService(Robot robot, ParticleReader particleReader, ReportPrinter printer) {
         this.robot = robot;
         this.particleReader = particleReader;
         this.printer = printer;
-        reportTimer.addTask(this::generate);
     }
 
-    private void generate() {
-
-        Report report = buildReport();
-        printer.printReport(report);
+    void generate() {
+        printer.printReport(buildReport());
     }
 
     private Report buildReport() {
@@ -33,10 +29,10 @@ public class ReportGenerator {
         int size = particleReader.values.size();
         int average = size > 0 ? sum / size : 0;
         return new Report(
-                    new Date().getTime(),
-                    new Location(robot.currentPosition.lat, robot.currentPosition.lng),
-                    getLevel(average),
-                    robot.source);
+                new Date().getTime(),
+                new Location(robot.currentPosition.lat, robot.currentPosition.lng),
+                getLevel(average),
+                robot.source);
     }
 
     private Level getLevel(int average) {

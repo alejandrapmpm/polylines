@@ -1,4 +1,4 @@
-package reporting;
+package reporting.model;
 
 public class Location {
 
@@ -9,7 +9,7 @@ public class Location {
         //this is due to jackson error
     }
 
-    Location(double lat, double lng) {
+    public Location(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
     }
