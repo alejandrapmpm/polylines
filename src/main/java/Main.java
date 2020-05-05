@@ -7,11 +7,12 @@ import reporting.task.ReportGeneratorTask;
 import reporting.printer.JsonReportPrinter;
 import service.ParticleReader;
 import service.RobotMovementService;
+import service.task.RobotMovementTask;
 
 public class Main {
 
     public static void main(String [] args){
-        String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+        String polyline = "{gr~F`b`vO`mIcgHusDz|U";
         /*
         *   Distance is: 42.93135105797141
             Distance is: 58.59883353809855
@@ -23,14 +24,15 @@ public class Main {
         );*/
         EncodedPolyline encoder = new EncodedPolyline(polyline);
         //robotMovementService.moveRobot(40);
-        Timer timer = new RealTimer(1000, TimeUnit.MILLISECONDS);
+        Timer robotScheduler = new RealTimer(1000, TimeUnit.MILLISECONDS);
         ParticleReader particleReader = new ParticleReader();
-        RobotMovementService robotMovementService = new RobotMovementService(encoder, 50d, timer, particleReader);
-        timer.start();
+        RobotMovementService robotMovementService = new RobotMovementService(encoder, 50d, particleReader);
+        RobotMovementTask robotMovementTask = new RobotMovementTask(robotScheduler, robotMovementService);
+        robotScheduler.start();
 
-        Timer reportTimer = new RealTimer(5000, TimeUnit.MILLISECONDS);
+        Timer reportingScheduler = new RealTimer(5000, TimeUnit.MILLISECONDS);
         ReportGeneratorService reportGenerator = new ReportGeneratorService(robotMovementService.robot, particleReader, new JsonReportPrinter());
-        ReportGeneratorTask reportTask = new ReportGeneratorTask(reportTimer, reportGenerator);
-        reportTimer.start();
+        ReportGeneratorTask reportTask = new ReportGeneratorTask(reportingScheduler, reportGenerator);
+        reportingScheduler.start();
     }
 }

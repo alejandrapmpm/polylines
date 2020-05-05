@@ -21,4 +21,8 @@ public class ParticleReader {
     public int generateRandomInt() {
         return random.nextInt(200);
     }
+
+    public void removePreviousReadings() {
+        values.clear();
+    }
 }

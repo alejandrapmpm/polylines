@@ -20,8 +20,11 @@ public class ReportGeneratorService {
         this.printer = printer;
     }
 
-    public void generate() {
-        printer.printReport(buildReport());
+    public Report generate() {
+        Report report = buildReport();
+        printer.printReport(report);
+        particleReader.removePreviousReadings();
+        return report;
     }
 
     private Report buildReport() {

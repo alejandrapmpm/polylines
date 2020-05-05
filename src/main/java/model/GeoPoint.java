@@ -19,6 +19,7 @@ public class GeoPoint {
                 '}';
     }
 
+    //TODO use a better comparison with precision
     @Override
     public boolean equals(Object o) {
         if (this == o) {
