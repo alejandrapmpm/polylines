@@ -34,7 +34,7 @@ public class RobotTest {
     private ManualTimer robotScheduler;
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
-    private static final double METERS_TO_MOVE = 50d;
+    private static final double METERS_TO_MOVE = 50;
     private static final String ROBOT_SOURCE_NAME = "ROBOT";
     private final GeoPointMapper mapper = new GeoPointMapper();
 
@@ -50,48 +50,51 @@ public class RobotTest {
     @Test
     public void whenRobotServiceIsCreated_robotIsCreatedWithCurrentPositionAsTheFirstOneOfThePointsEncoded(){
 
-        List<LatLng> points = asList(new LatLng(41.84888, -87.63860),
-                new LatLng(41.84856, -87.63831));
-        when(encoder.decodePath()).thenReturn(points);
+        when(encoder.decodePath()).thenReturn(asList(
+                new LatLng(41.84888, -87.63860),
+                new LatLng(41.84856, -87.63831)));
 
         Robot robot = new Robot(mapper.map(encoder.decodePath()), METERS_TO_MOVE);
 
-        assertEquals(new GeoPoint(41.84888, -87.63860), robot.currentPosition);
+        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
-    public void whenThereIsOnlyOneGeoPoint_robotEndsInThatOne(){
+    public void whenThereIsOnlyOneGeoPoint_robotStaysInCurrentInitialPosition(){
 
-        List<LatLng> points = singletonList(new LatLng(41.84888, -87.63860));
-        when(encoder.decodePath()).thenReturn(points);
+        when(encoder.decodePath()).thenReturn(singletonList(new LatLng(41.84888, -87.63860)));
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
 
+        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84888, -87.63860),
-                robot.currentPosition);
+        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
     public void whenMetersToMoveAreLessThanDistanceToNextGeoPoint_robotEndsInAnIntermediateGeoPoint(){
 
-        List<LatLng> points = asList(new LatLng(41.84888, -87.63860),
-                new LatLng(41.84856, -87.63831)); //this two points are 42.9 meters far from each other
-        when(encoder.decodePath()).thenReturn(points);
+        //these two points are 42.9 meters far from each other
+        when(encoder.decodePath()).thenReturn(asList(
+                new LatLng(41.84888, -87.63860),
+                new LatLng(41.84856, -87.63831)));
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 20d);
-
+        Robot robot = new Robot(journey, 20);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84873092479406, -87.63846490059463),
-                robot.currentPosition);
+        assertEquals(41.84873, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63846, robot.currentPosition.lng, 0.00001);
+        assertEquals(1, app.nextPosition);
     }
 
     @Test
@@ -99,19 +102,18 @@ public class RobotTest {
 
         //String polyline = "orl~Ff|{uO~@y@";
 
-        List<LatLng> points = asList(new LatLng(41.84888, -87.63860),
-                new LatLng(41.84856, -87.63831)); //these two points are 42.9 meters far from each other
-        when(encoder.decodePath()).thenReturn(points);
+        when(encoder.decodePath()).thenReturn(asList(
+                new LatLng(41.84888, -87.63860),
+                new LatLng(41.84856, -87.63831)));
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 43d);
-
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84856, -87.63831),
-                robot.currentPosition);
+        assertEquals(41.84856, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63831, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
@@ -119,45 +121,46 @@ public class RobotTest {
 
         //String polyline = "orl~Ff|{uO~@y@";
 
-        List<LatLng> points = asList(new LatLng(41.84888, -87.63860),
-                new LatLng(41.84856, -87.63831)); //these two points are 42.9 meters far from each other
-        when(encoder.decodePath()).thenReturn(points);
+        when(encoder.decodePath()).thenReturn(asList(
+                new LatLng(41.84888, -87.63860),
+                new LatLng(41.84856, -87.63831)));
 
-        double distance = DistanceCalculator.calculate(new GeoPoint(41.84888, -87.63860),
+        double distance = DistanceCalculator.calculate(
+                new GeoPoint(41.84888, -87.63860),
                 new GeoPoint(41.84856, -87.63831)); //TODO - Revisit calculation for easier use when mocking
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, distance);
-
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84856, -87.63831),
-                robot.currentPosition);
+        assertEquals(41.84856, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63831, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
-    public void whenMetersToMoveIsGreaterThanAllTheDistancesBetweenPoints_moveRobotAlongAllPoints_andEndsInLastGeoPoint(){
+    public void whenMetersToMoveIsGreaterThanTheSumOfAllDistancesInTheJourney_robotMovesEndsInLastGeoPoint(){
 
-/*          String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+        /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
             Distance is: 58.59883353809855
-            Distance is: 87.86280526271533*/
+            Distance is: 87.86280526271533
+            */
         mockPolylineDecoding();
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 1000d);
-
+        Robot robot = new Robot(journey, 1000);
         RobotApplication app = new RobotApplication(robot, particleReader);
+
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84906, -87.63693),
-                robot.currentPosition);
+        assertEquals(41.84906, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63693, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
-    public void movingTwiceTheRobot_shouldKeepState(){
+    public void movingTwiceTheRobot_shouldMoveRobotFollowingPolyline(){
 
         /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
@@ -172,42 +175,38 @@ public class RobotTest {
         mockPolylineDecoding();
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 40d);
-
+        Robot robot = new Robot(journey, 40);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84858184958813, -87.63832980118924),
-                robot.currentPosition);
+        assertEquals(41.84858, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63832, robot.currentPosition.lng, 0.00001);
         assertEquals(1, app.nextPosition);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.848857314177536, -87.63810757332594),
-                robot.currentPosition);
+        assertEquals(41.84885, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.63810, robot.currentPosition.lng, 0.00001);
         assertEquals(2, app.nextPosition);
     }
 
     @Test
-    public void whenTimerFinishes_robotShouldHaveMoved(){
+    public void whenRobotSchedulerFires_robotShouldMove(){
 
         mockDecodeLongPolyline();
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
 
+        List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
         RobotApplication app = new RobotApplication(robot, particleReader);
         RobotMovementTask task = new RobotMovementTask(robotScheduler, app);
 
         fire(robotScheduler);
 
-        assertEquals(new GeoPoint(41.87752475866416, -87.65967737260071), robot.currentPosition);
+        assertEquals(41.87752, robot.currentPosition.lat, 0.00001);
+        assertEquals(-87.65967, robot.currentPosition.lng, 0.00001);
+
         assertEquals(1, app.nextPosition);
-
-        GeoPoint origin = new GeoPoint(41.87790000, -87.66001000);
-        double distance = DistanceCalculator.calculate(robot.currentPosition, origin);
-        assertEquals(METERS_TO_MOVE, distance, 0.1);
-
     }
 
     @Test
@@ -215,7 +214,7 @@ public class RobotTest {
 
         mockPolylineDecoding();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey,  100d);
+        Robot robot = new Robot(journey,  100);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         RobotMovementTask task = new RobotMovementTask(robotScheduler, app);
@@ -226,7 +225,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenReportingSchedulerFinishes_shouldGenerateAndPrintToConsoleAReportOfParticles() throws IOException {
+    public void whenReportingSchedulerFires_shouldGenerateAndPrintToConsoleAReportOfParticles() throws IOException {
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -234,16 +233,13 @@ public class RobotTest {
         PrintStream originalErr = System.err;
 
         mockSystemOut(outContent, errContent);
-
         mockPolylineDecoding();
 
         ParticleReader spyParticleReader = Mockito.spy(particleReader);
         Mockito.doReturn(51).when(spyParticleReader).generateRandomInt();
 
-        GeoPointMapper mapper = new GeoPointMapper();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 300d);
-
+        Robot robot = new Robot(journey, 300);
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
         ManualTimer reportingScheduler = new ManualTimer();
@@ -271,9 +267,8 @@ public class RobotTest {
         ParticleReader spyParticleReader = Mockito.spy(particleReader);
         Mockito.doReturn(51).doReturn(101).when(spyParticleReader).generateRandomInt();
 
-        GeoPointMapper mapper = new GeoPointMapper();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 100d);
+        Robot robot = new Robot(journey, 100);
 
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
@@ -281,14 +276,53 @@ public class RobotTest {
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, spyParticleReader, new JsonReportPrinter());
         new ReportGeneratorTask(reportTimer, reportGeneratorService);
 
-        app.moveRobot();
+        app.moveRobot(); // The particles reader generates 51 - which is Moderate level
+
         Report report = reportGeneratorService.generate();
+
         assertEquals(Level.Moderate, report.level);
 
-        app.moveRobot();
-        report = reportGeneratorService.generate();
-        assertEquals(Level.USG, report.level);
+        app.moveRobot(); // The particles reader generates 101 - which is USG level
 
+        report = reportGeneratorService.generate();
+
+        assertEquals(Level.USG, report.level);
+    }
+
+    @Test
+    public void whenNoParticlesRead_AverageIsStillZero() throws IOException {
+
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+
+        mockSystemOut(outContent, errContent);
+
+        mockDecodeLongPolyline();
+
+        ParticleReader spyParticleReader = Mockito.spy(particleReader);
+
+        GeoPointMapper mapper = new GeoPointMapper();
+        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        Robot robot = new Robot(journey, 99);
+
+        RobotApplication app = new RobotApplication(robot, spyParticleReader);
+
+        ManualTimer reportTimer = new ManualTimer();
+
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
+        ReportGeneratorTask reportGeneratorTask = new ReportGeneratorTask(reportTimer, reportGeneratorService);
+
+        app.moveRobot();
+        fire(reportTimer);
+
+        Report report = mapWrittenOutputToReport(outContent);
+
+        assertEquals(Level.Good, report.level);
+        verify(spyParticleReader, never()).run();
+
+        leaveSystemOutAsItWasBefore(originalOut, originalErr);
     }
 
     private void mockPolylineDecoding() {
@@ -308,42 +342,6 @@ public class RobotTest {
                 new LatLng(41.82445000,-87.61263000)
         );
         when(encoder.decodePath()).thenReturn(points);
-    }
-
-    @Test
-    public void whenNoParticlesRead_AverageIsStillZero() throws IOException {
-
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        PrintStream originalErr = System.err;
-
-        mockSystemOut(outContent, errContent);
-
-        List<LatLng> points = singletonList(new LatLng(41.84888, -87.63860000000001));
-        when(encoder.decodePath()).thenReturn(points);
-
-        ParticleReader spyParticleReader = Mockito.spy(particleReader);
-
-        GeoPointMapper mapper = new GeoPointMapper();
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 2d);
-
-        RobotApplication app = new RobotApplication(robot, spyParticleReader);
-
-        ManualTimer reportTimer = new ManualTimer();
-
-        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
-        ReportGeneratorTask reportGeneratorTask = new ReportGeneratorTask(reportTimer, reportGeneratorService);
-
-        fire(reportTimer);
-
-        Report report = mapWrittenOutputToReport(outContent);
-
-        assertEquals(Level.Good, report.level);
-        verify(spyParticleReader, never()).run();
-
-        leaveSystemOutAsItWasBefore(originalOut, originalErr);
     }
 
     private Report mapWrittenOutputToReport(ByteArrayOutputStream outContent) throws IOException {

@@ -31,7 +31,7 @@ public class Main {
 
         ParticleReader particleReader = new ParticleReader();
 
-        Robot robot = new Robot(journey, 50d);
+        Robot robot = new Robot(journey, 50);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
         Timer robotScheduler = new RealTimer(1000, TimeUnit.MILLISECONDS);
