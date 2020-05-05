@@ -22,7 +22,7 @@ public class ReportGeneratorService {
 
     public Report generate() {
         Report report = buildReport();
-        printer.printReport(report);
+        printer.print(report);
         particleReader.removePreviousReadings();
         return report;
     }

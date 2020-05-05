@@ -7,7 +7,7 @@ import reporting.model.Report;
 public class JsonReportPrinter implements ReportPrinter {
 
     @Override
-    public void printReport(Report report) {
+    public void print(Report report) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(report);

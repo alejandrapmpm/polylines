@@ -4,5 +4,5 @@ import reporting.model.Report;
 
 public interface ReportPrinter {
 
-    void printReport(Report report);
+    void print(Report report);
 }

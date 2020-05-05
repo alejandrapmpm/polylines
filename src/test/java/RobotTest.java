@@ -15,23 +15,21 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import clock.ManualTimer;
+import clock.ManualScheduler;
 import model.GeoPoint;
 import model.Level;
 import model.Robot;
 import reporting.model.Report;
 import reporting.printer.JsonReportPrinter;
 import reporting.service.ReportGeneratorService;
-import reporting.task.ReportGeneratorTask;
 import app.ParticleReader;
 import app.RobotApplication;
-import app.task.RobotMovementTask;
 import utilities.DistanceCalculator;
 import utilities.GeoPointMapper;
 
 public class RobotTest {
 
-    private ManualTimer robotScheduler;
+    private ManualScheduler robotScheduler;
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
     private static final double METERS_TO_MOVE = 50;
@@ -41,7 +39,7 @@ public class RobotTest {
 
     @Before
     public void setup(){
-        robotScheduler = new ManualTimer();
+        robotScheduler = new ManualScheduler();
         encoder = Mockito.mock(EncodedPolyline.class);
         particleReader = new ParticleReader();
     }
@@ -160,7 +158,7 @@ public class RobotTest {
     }
 
     @Test
-    public void movingTwiceTheRobot_shouldMoveRobotFollowingPolyline(){
+    public void movingTwiceTheRobot_shouldMoveRobotAlongPolyline(){
 
         /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
@@ -199,7 +197,8 @@ public class RobotTest {
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
         RobotApplication app = new RobotApplication(robot, particleReader);
-        RobotMovementTask task = new RobotMovementTask(robotScheduler, app);
+
+        robotScheduler.addTask(app::moveRobot);
 
         fire(robotScheduler);
 
@@ -216,8 +215,7 @@ public class RobotTest {
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey,  100);
         RobotApplication app = new RobotApplication(robot, particleReader);
-
-        RobotMovementTask task = new RobotMovementTask(robotScheduler, app);
+        robotScheduler.addTask(app::moveRobot);
 
         fire(robotScheduler);
 
@@ -242,11 +240,12 @@ public class RobotTest {
         Robot robot = new Robot(journey, 300);
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
-        ManualTimer reportingScheduler = new ManualTimer();
+        ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, spyParticleReader, new JsonReportPrinter());
-        new ReportGeneratorTask(reportingScheduler, reportGeneratorService);
+        reportingScheduler.addTask(reportGeneratorService::generate);
 
         app.moveRobot();
+
         fire(reportingScheduler);
 
         Report report = mapWrittenOutputToReport(outContent);
@@ -272,9 +271,7 @@ public class RobotTest {
 
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
-        ManualTimer reportTimer = new ManualTimer();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, spyParticleReader, new JsonReportPrinter());
-        new ReportGeneratorTask(reportTimer, reportGeneratorService);
 
         app.moveRobot(); // The particles reader generates 51 - which is Moderate level
 
@@ -290,7 +287,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenNoParticlesRead_AverageIsStillZero() throws IOException {
+    public void whenReportingSchedulerFiresAndNoParticlesRead_AverageIsStillZero() throws IOException {
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -309,13 +306,12 @@ public class RobotTest {
 
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
-        ManualTimer reportTimer = new ManualTimer();
-
+        ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
-        ReportGeneratorTask reportGeneratorTask = new ReportGeneratorTask(reportTimer, reportGeneratorService);
+        reportingScheduler.addTask(reportGeneratorService::generate);
 
         app.moveRobot();
-        fire(reportTimer);
+        fire(reportingScheduler);
 
         Report report = mapWrittenOutputToReport(outContent);
 
@@ -359,7 +355,7 @@ public class RobotTest {
         System.setErr(new PrintStream(errContent));
     }
 
-    private void fire(ManualTimer timer) {
+    private void fire(ManualScheduler timer) {
         timer.start();
         timer.elapseTime();
     }

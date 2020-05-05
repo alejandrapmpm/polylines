@@ -6,14 +6,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class RealTimer implements Timer {
+public class RealScheduler implements Scheduler {
 
     private final long period;
     private final TimeUnit periodTimeUnit;
     private final List<Task> tasks;
     private final ScheduledExecutorService scheduler;
 
-    public RealTimer(long period, TimeUnit periodTimeUnit) {
+    public RealScheduler(long period, TimeUnit periodTimeUnit) {
         this.period = period;
         this.periodTimeUnit = periodTimeUnit;
         this.tasks = new ArrayList<>();

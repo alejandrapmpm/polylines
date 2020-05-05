@@ -1,16 +1,14 @@
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
-import clock.Timer;
-import clock.RealTimer;
-import model.GeoPoint;
-import model.Robot;
-import reporting.service.ReportGeneratorService;
-import reporting.task.ReportGeneratorTask;
-import reporting.printer.JsonReportPrinter;
 import app.ParticleReader;
 import app.RobotApplication;
-import app.task.RobotMovementTask;
+import clock.RealScheduler;
+import clock.Scheduler;
+import model.GeoPoint;
+import model.Robot;
+import reporting.printer.JsonReportPrinter;
+import reporting.service.ReportGeneratorService;
 import utilities.GeoPointMapper;
 
 public class Main {
@@ -34,12 +32,12 @@ public class Main {
         Robot robot = new Robot(journey, 50);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
-        Timer robotScheduler = new RealTimer(1000, TimeUnit.MILLISECONDS);
-        RobotMovementTask robotMovementTask = new RobotMovementTask(robotScheduler, app);
+        Scheduler robotScheduler = new RealScheduler(1000, TimeUnit.MILLISECONDS);
+        robotScheduler.addTask(app::moveRobot);
 
-        Timer reportingScheduler = new RealTimer(5000, TimeUnit.MILLISECONDS);
+        Scheduler reportingScheduler = new RealScheduler(5000, TimeUnit.MILLISECONDS);
         ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
-        ReportGeneratorTask reportTask = new ReportGeneratorTask(reportingScheduler, reportGenerator);
+        reportingScheduler.addTask(reportGenerator::generate);
 
         robotScheduler.start();
         reportingScheduler.start();

@@ -3,7 +3,7 @@ package clock;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManualTimer implements Timer {
+public class ManualScheduler implements Scheduler {
 
     private final List<Task> tasks = new ArrayList<>();
 

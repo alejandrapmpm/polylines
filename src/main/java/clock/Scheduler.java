@@ -1,6 +1,6 @@
 package clock;
 
-public interface Timer {
+public interface Scheduler {
 
     void addTask(Task task);
     void start();
