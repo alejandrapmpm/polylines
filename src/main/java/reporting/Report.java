@@ -12,7 +12,7 @@ public class Report {
     public Report() {
     }
 
-    public Report(long timestamp, Location location, Level level, String source) {
+    Report(long timestamp, Location location, Level level, String source) {
         this.timestamp = timestamp;
         this.location = location;
         this.level = level;

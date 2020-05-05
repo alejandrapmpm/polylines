@@ -4,5 +4,5 @@ public enum Level {
     Good,
     Moderate,
     USG,
-    Unhealty;
+    Unhealthy;
 }

@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import clock.ManualClock;
+import clock.ManualTimer;
 import model.GeoPoint;
 import model.Level;
 import reporting.Report;
@@ -25,14 +25,14 @@ import utilities.DistanceCalculator;
 
 public class RobotTest {
 
-    private ManualClock robotTimer;
+    private ManualTimer robotTimer;
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
     private static final double METERS_TO_MOVE = 50d;
 
     @Before
     public void setup(){
-        robotTimer = new ManualClock();
+        robotTimer = new ManualTimer();
         encoder = Mockito.mock(EncodedPolyline.class);
         particleReader = new ParticleReader();
     }
@@ -112,7 +112,7 @@ public class RobotTest {
                 new LatLng(41.84856, -87.63831)); //these two points are 42.9 meters far from each other
         when(encoder.decodePath()).thenReturn(points);
 
-        double distance = DistanceCalculator.distance(new GeoPoint(41.84888, -87.63860),
+        double distance = DistanceCalculator.calculate(new GeoPoint(41.84888, -87.63860),
                 new GeoPoint(41.84856, -87.63831)); //Not sure how I feel about this- Maybe its easier to mock this utilityg
 
         RobotMovementService robotMovementService = new RobotMovementService(encoder, METERS_TO_MOVE, robotTimer, particleReader);
@@ -247,7 +247,7 @@ public class RobotTest {
         Mockito.doReturn(51).when(spyParticleReader).generateRandomInt();
 
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 300d, robotTimer, spyParticleReader);
-        ManualClock reportTimer = new ManualClock();
+        ManualTimer reportTimer = new ManualTimer();
 
         new ReportGenerator(robotMovementService.robot, spyParticleReader, reportTimer);
 
@@ -283,7 +283,7 @@ public class RobotTest {
 
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 2d, robotTimer, new ParticleReader());
 
-        ManualClock reportTimer = new ManualClock();
+        ManualTimer reportTimer = new ManualTimer();
         new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
 
         fireTimer(reportTimer);
@@ -313,7 +313,7 @@ public class RobotTest {
         System.setErr(new PrintStream(errContent));
     }
 
-    private void fireTimer(ManualClock reportTimer) {
+    private void fireTimer(ManualTimer reportTimer) {
         reportTimer.start();
         reportTimer.elapseTime();
     }

@@ -9,7 +9,7 @@ public class Location {
         //this is due to jackson error
     }
 
-    public Location(double lat, double lng) {
+    Location(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
     }

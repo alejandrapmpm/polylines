@@ -1,11 +1,10 @@
 package service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import clock.Clock;
+import clock.Timer;
 import model.GeoPoint;
 import model.Robot;
 import utilities.DistanceCalculator;
@@ -17,12 +16,12 @@ public class RobotMovementService {
     public int nextPosition;
     public double metersMoved;
 
-    public RobotMovementService(EncodedPolyline encoder, double meters, Clock clock, ParticleReader particleReader) {
+    public RobotMovementService(EncodedPolyline encoder, double meters, Timer timer, ParticleReader particleReader) {
         this.robot = new Robot(map(encoder.decodePath()));
         this.nextPosition = 1;
         this.particleReader = particleReader;
         this.metersMoved = 0;
-        clock.addTask(() -> moveRobot(meters));
+        timer.addTask(() -> moveRobot(meters));
     }
 
     private List<GeoPoint> map(List<LatLng> decodePath) {
@@ -38,7 +37,7 @@ public class RobotMovementService {
         if (notYetAtTheEnd(robot.currentPosition)) {
             GeoPoint to = robot.journey.get(nextPosition);
             while (remainingMeters > 0 && notYetAtTheEnd(robot.currentPosition)) {
-                double distanceBetweenGeoPoints = DistanceCalculator.distance(robot.currentPosition, to);
+                double distanceBetweenGeoPoints = DistanceCalculator.calculate(robot.currentPosition, to);
                 if (distanceBetweenGeoPoints > remainingMeters) {
                     moveToIntermediateGeoPoint(remainingMeters, to);
                     metersMoved += remainingMeters;

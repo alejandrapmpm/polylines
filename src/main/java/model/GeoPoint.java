@@ -7,7 +7,6 @@ public class GeoPoint {
     public final double lng;
 
     public GeoPoint(double lat, double lng) {
-
         this.lat = lat;
         this.lng = lng;
     }

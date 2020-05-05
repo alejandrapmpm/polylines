@@ -6,15 +6,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class RealClock implements Clock{
+public class RealTimer implements Timer {
+
     private final long period;
     private final TimeUnit periodTimeUnit;
-    private final List<Task> tasks = new ArrayList<>();
-    private final ScheduledExecutorService timerService = Executors.newSingleThreadScheduledExecutor();
+    private final List<Task> tasks;
+    private final ScheduledExecutorService scheduler;
 
-    public RealClock(long period, TimeUnit periodTimeUnit) {
+    public RealTimer(long period, TimeUnit periodTimeUnit) {
         this.period = period;
         this.periodTimeUnit = periodTimeUnit;
+        this.tasks = new ArrayList<>();
+        this.scheduler =  Executors.newSingleThreadScheduledExecutor();
     }
 
     @Override
@@ -24,7 +27,7 @@ public class RealClock implements Clock{
 
     @Override
     public void start() {
-        timerService.scheduleAtFixedRate(this::performTask, period, period, periodTimeUnit);
+        scheduler.scheduleAtFixedRate(this::performTask, period, period, periodTimeUnit);
     }
 
     private void performTask() {

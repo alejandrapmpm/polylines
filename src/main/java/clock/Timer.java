@@ -1,6 +1,7 @@
 package clock;
 
-public interface Clock {
+public interface Timer {
+
     void addTask(Task task);
     void start();
 

@@ -3,8 +3,10 @@ package clock;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManualClock implements Clock{
+public class ManualTimer implements Timer {
+
     private final List<Task> tasks = new ArrayList<>();
+
     @Override
     public void addTask(Task task) {
         tasks.add(task);
@@ -12,7 +14,7 @@ public class ManualClock implements Clock{
 
     @Override
     public void start() {
-        // Ignored
+        // Nothing to do
     }
 
     public void elapseTime(){

@@ -7,7 +7,7 @@ import java.util.Random;
 public class ParticleReader {
 
     public List<Integer> values = new ArrayList<>();
-    private Random random;
+    private final Random random;
 
     public ParticleReader() {
         random = new Random();
