@@ -3,6 +3,7 @@ import com.google.maps.model.EncodedPolyline;
 import clock.Timer;
 import clock.RealTimer;
 import reporting.ReportGenerator;
+import reporting.printer.ConsoleReportPrinter;
 import service.ParticleReader;
 import service.RobotMovementService;
 
@@ -27,7 +28,8 @@ public class Main {
         timer.start();
 
         Timer reportTimer = new RealTimer(5000, TimeUnit.MILLISECONDS);
-        ReportGenerator reportGenerator = new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
+        ReportGenerator reportGenerator = new ReportGenerator(robotMovementService.robot, particleReader,
+                reportTimer, new ConsoleReportPrinter());
         reportTimer.start();
     }
 }

@@ -6,33 +6,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import clock.Timer;
 import model.Level;
 import model.Robot;
+import reporting.printer.ReportPrinter;
 import service.ParticleReader;
 
 public class ReportGenerator {
     private final Robot robot;
     private final ParticleReader particleReader;
+    private final ReportPrinter printer;
 
-    public ReportGenerator(Robot robot, ParticleReader particleReader, Timer reportTimer) {
+    public ReportGenerator(Robot robot, ParticleReader particleReader, Timer reportTimer, ReportPrinter printer) {
 
         this.robot = robot;
         this.particleReader = particleReader;
+        this.printer = printer;
         reportTimer.addTask(this::generate);
     }
 
     private void generate() {
 
         Report report = buildReport();
-        printReport(report);
-    }
-
-    private void printReport(Report report) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String json = mapper.writeValueAsString(report);
-            System.out.println(json);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        printer.printReport(report);
     }
 
     private Report buildReport() {

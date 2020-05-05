@@ -19,6 +19,7 @@ import model.GeoPoint;
 import model.Level;
 import reporting.Report;
 import reporting.ReportGenerator;
+import reporting.printer.ConsoleReportPrinter;
 import service.ParticleReader;
 import service.RobotMovementService;
 import utilities.DistanceCalculator;
@@ -249,7 +250,7 @@ public class RobotTest {
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 300d, robotTimer, spyParticleReader);
         ManualTimer reportTimer = new ManualTimer();
 
-        new ReportGenerator(robotMovementService.robot, spyParticleReader, reportTimer);
+        new ReportGenerator(robotMovementService.robot, spyParticleReader, reportTimer, new ConsoleReportPrinter());
 
         fireTimer(robotTimer);
         fireTimer(reportTimer);
@@ -284,7 +285,7 @@ public class RobotTest {
         RobotMovementService robotMovementService = new RobotMovementService(encoder, 2d, robotTimer, new ParticleReader());
 
         ManualTimer reportTimer = new ManualTimer();
-        new ReportGenerator(robotMovementService.robot, particleReader, reportTimer);
+        new ReportGenerator(robotMovementService.robot, particleReader, reportTimer, new ConsoleReportPrinter());
 
         fireTimer(reportTimer);
 
