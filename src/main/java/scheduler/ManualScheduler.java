@@ -3,6 +3,7 @@ package scheduler;
 import java.util.ArrayList;
 import java.util.List;
 
+//This class is for testing purposes
 public class ManualScheduler implements Scheduler {
 
     private final List<Task> tasks = new ArrayList<>();

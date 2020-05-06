@@ -1,11 +1,11 @@
 package reporting.service;
 
 import java.util.Date;
+import app.ParticleReader;
 import model.Robot;
 import reporting.model.Location;
 import reporting.model.Report;
 import reporting.printer.ReportPrinter;
-import app.ParticleReader;
 
 public class ReportGeneratorService {
 

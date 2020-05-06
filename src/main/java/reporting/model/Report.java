@@ -9,7 +9,7 @@ public class Report {
         Unhealthy;
     }
 
-    //TODO do this final but need to get rid of the default constructor
+    //TODO make fields final but need to get rid of the default constructor
     public long timestamp;
     public Location location;
     public Level level;

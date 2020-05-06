@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
 import app.ParticleReader;
 import app.RobotApplication;
+import exception.RobotValidationException;
 import model.GeoPoint;
 import model.Robot;
 import reporting.printer.JsonReportPrinter;
@@ -19,7 +20,7 @@ public class MoveRobotApp {
     private static ParticleReader particleReader = new ParticleReader();
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
-    public static void main(String [] args){
+    public static void main(String[] args) throws RobotValidationException {
         String polyline = "mpjyHx`i@VjAVKnAh@BHHX@LZR@Bj@Ml@WWc@]w@bAyAfBmCb@o@pLeQfCsDVa@@ODQR}AJ{A?{BGuAD_@FKb@MTUX]Le@" +
                 "^kBVcAVo@Ta@|EaFh@m@FWaA{DCo@q@mCm@cC{A_GWeA}@sGSeAcA_EOSMa@}A_GsAwFkAiEoAaFaBoEGo@]_AIWW{AQyAUyBQqAI_BF" +
                 "kEd@aHZcDlAyJLaBPqDDeD?mBEiA}@F]yKWqGSkICmCIeZIuZi@_Sw@{WgAoXS{DOcAWq@KQGIFQDGn@Y`@MJEFIHyAVQVOJGHgFRJBB" +
@@ -28,11 +29,10 @@ public class MoveRobotApp {
                 "C{BmAeAo@s@uAoB_AaBmAwCa@mAo@iCgAwFg@iDq@}G[uEU_GBuP@cICmA?eI?qCB{FBkCI}BOyCMiAGcAC{AN{YFqD^}FR}CNu@JcAH" +
                 "u@b@_E`@}DVsB^mBTsAQKkCmAg@[YQOIOvAi@[m@e@s@g@GKCKAEJIn@g@GYGIc@ScBoAf@{A`@uAlBfAG`@";
 
-        EncodedPolyline encoder = new EncodedPolyline(polyline);
-        List<GeoPoint> journey = generateGeoPoints(encoder);
+        List<GeoPoint> journey = generateGeoPoints(new EncodedPolyline(polyline));
 
-        Scheduler robotScheduler = new RealScheduler(1,0,  TimeUnit.SECONDS);
-        Scheduler reportingScheduler = new RealScheduler(15 , 15, TimeUnit.MINUTES);
+        Scheduler robotScheduler = new RealScheduler(1, 0, TimeUnit.SECONDS);
+        Scheduler reportingScheduler = new RealScheduler(15, 15, TimeUnit.MINUTES);
 
         Robot robot = new Robot(journey, SPEED);
 
@@ -45,7 +45,6 @@ public class MoveRobotApp {
         robotScheduler.start();
         reportingScheduler.start();
     }
-
 
     private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {
         GeoPointMapper mapper = new GeoPointMapper();

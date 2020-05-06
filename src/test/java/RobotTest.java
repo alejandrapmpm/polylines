@@ -1,4 +1,5 @@
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +19,7 @@ import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
 import app.ParticleReader;
 import app.RobotApplication;
+import exception.RobotValidationException;
 import model.GeoPoint;
 import model.Robot;
 import reporting.model.Report;
@@ -46,10 +48,9 @@ public class RobotTest {
         encoder = Mockito.mock(EncodedPolyline.class);
         particleReader = new ParticleReader();
     }
-    //ToDO handle empty or wrong polyline
 
     @Test
-    public void whenRobotServiceIsCreated_robotIsCreatedWithCurrentPositionAsTheFirstOneOfThePointsEncoded(){
+    public void whenRobotServiceIsCreated_robotIsCreatedWithCurrentPositionAsTheFirstOneOfThePointsEncoded() throws RobotValidationException {
 
         when(encoder.decodePath()).thenReturn(asList(
                 new LatLng(41.84888, -87.63860),
@@ -61,26 +62,22 @@ public class RobotTest {
         assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
     }
 
-    @Test
-    public void whenThereIsOnlyOneGeoPoint_robotStaysInCurrentInitialPosition(){
+    @Test(expected = RobotValidationException.class)
+    public void whenThereIsOnlyOneGeoPoint_robotStaysInCurrentInitialPosition() throws RobotValidationException {
 
-        when(encoder.decodePath()).thenReturn(singletonList(new LatLng(41.84888, -87.63860)));
+       new Robot(singletonList(new GeoPoint(41.84888, -87.63860)), METERS_TO_MOVE);
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, METERS_TO_MOVE);
+    }
 
-        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+    @Test(expected = RobotValidationException.class)
+    public void whenEmptyGeoPoints_robotStaysInCurrentInitialPosition() throws RobotValidationException {
 
-        app.moveRobot();
+        new Robot(emptyList(), METERS_TO_MOVE);
 
-        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
     }
 
     @Test
-    public void whenMetersToMoveAreLessThanDistanceToNextGeoPoint_robotEndsInAnIntermediateGeoPoint(){
+    public void whenMetersToMoveAreLessThanDistanceToNextGeoPoint_robotEndsInAnIntermediateGeoPoint() throws RobotValidationException {
 
         //these two points are 42.9 meters far from each other
         when(encoder.decodePath()).thenReturn(asList(
@@ -99,7 +96,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenMetersToMoveAreFurtherThanNextGeoPoint_andNoGeoPointsLeft_robotEndsInLastGeoPoint(){
+    public void whenMetersToMoveAreFurtherThanNextGeoPoint_andNoGeoPointsLeft_robotEndsInLastGeoPoint() throws RobotValidationException {
 
         //String polyline = "orl~Ff|{uO~@y@";
 
@@ -118,7 +115,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenMetersToMoveAreExactlyTheDistanceBetweenTwoGeoPoints_robotEndsInTheSecondGeoPoint(){
+    public void whenMetersToMoveAreExactlyTheDistanceBetweenTwoGeoPoints_robotEndsInTheSecondGeoPoint() throws RobotValidationException {
 
         //String polyline = "orl~Ff|{uO~@y@";
 
@@ -141,7 +138,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenMetersToMoveIsGreaterThanTheSumOfAllDistancesInTheJourney_robotMovesEndsInLastGeoPoint(){
+    public void whenMetersToMoveIsGreaterThanTheSumOfAllDistancesInTheJourney_robotMovesEndsInLastGeoPoint() throws RobotValidationException {
 
         /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
@@ -161,7 +158,7 @@ public class RobotTest {
     }
 
     @Test
-    public void movingTwiceTheRobot_shouldMoveRobotAlongPolyline(){
+    public void movingTwiceTheRobot_shouldMoveRobotAlongPolyline() throws RobotValidationException {
 
         /*  String polyline = "orl~Ff|{uO~@y@}A_AEsE";
             Distance is: 42.93135105797141
@@ -193,7 +190,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenRobotSchedulerFires_robotShouldMove(){
+    public void whenRobotSchedulerFires_robotShouldMove() throws RobotValidationException {
 
         mockDecodeLongPolyline();
 
@@ -212,7 +209,7 @@ public class RobotTest {
     }
 
     @Test
-    public void after100Meters_shouldReadParticles(){
+    public void after100Meters_shouldReadParticles() throws RobotValidationException {
 
         mockPolylineDecoding();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
@@ -226,7 +223,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenReportingSchedulerFires_shouldGenerateAndPrintToConsoleAReportOfParticles() throws IOException {
+    public void whenReportingSchedulerFires_shouldGenerateAndPrintToConsoleAReportOfParticles() throws IOException, RobotValidationException {
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -262,7 +259,7 @@ public class RobotTest {
     }
 
     @Test
-    public void generatingAReport_ShouldNotTakeIntoAccountPreviousReadings(){
+    public void generatingAReport_ShouldNotTakeIntoAccountPreviousReadings() throws RobotValidationException {
 
         mockDecodeLongPolyline();
 
@@ -306,7 +303,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenReportingSchedulerFiresAndNoParticlesRead_AverageIsStillZero() throws IOException {
+    public void whenReportingSchedulerFiresAndNoParticlesRead_AverageIsStillZero() throws IOException, RobotValidationException {
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -341,7 +338,7 @@ public class RobotTest {
     }
 
     @Test
-    public void whenRobotHasArrivedToLastPosition_RobotSchedulerAndReportingSchedulerShouldStop(){
+    public void whenRobotHasArrivedToLastPosition_RobotSchedulerAndReportingSchedulerShouldStop() throws RobotValidationException {
 
         //String polyline = "orl~Ff|{uO~@y@";
 
