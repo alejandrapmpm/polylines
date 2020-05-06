@@ -27,7 +27,7 @@ public class RobotApplication {
                     travelledMeters += remainingMeters;
                     remainingMeters = 0;
                 } else {
-                    moveToNextGeoPoint();
+                    robot.currentPosition = moveToNextGeoPoint();
                     travelledMeters += distance;
                     remainingMeters -= distance;
                     if (robot.notArrivedYet()) {
@@ -49,8 +49,9 @@ public class RobotApplication {
         return new GeoPoint(newLat, newLng);
     }
 
-    private void moveToNextGeoPoint() {
+    private GeoPoint moveToNextGeoPoint() {
         robot.currentPosition = robot.journey.get(nextPosition);
         nextPosition++;
+        return robot.currentPosition;
     }
 }
