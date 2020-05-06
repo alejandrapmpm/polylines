@@ -1,7 +1,6 @@
 package reporting.service;
 
 import java.util.Date;
-import model.Level;
 import model.Robot;
 import reporting.model.Location;
 import reporting.model.Report;
@@ -32,7 +31,7 @@ public class ReportGeneratorService {
                 getCurrentTimestamp(),
                 getRobotLocation(),
                 getLevel(),
-                robot.source);
+                Robot.source);
     }
 
     private long getCurrentTimestamp() {
@@ -43,19 +42,19 @@ public class ReportGeneratorService {
         return new Location(robot.currentPosition.lat, robot.currentPosition.lng);
     }
 
-    private Level getLevel() {
+    private Report.Level getLevel() {
         double average = particleReader.values.stream()
                 .mapToInt(i -> i)
                 .average()
                 .orElse(0);
         if (average >= 0 && average <= 50) {
-            return Level.Good;
+            return Report.Level.Good;
         } else if (average <= 100) {
-            return Level.Moderate;
+            return Report.Level.Moderate;
         } else if (average <= 150) {
-            return Level.USG;
+            return Report.Level.USG;
         } else {
-            return Level.Unhealthy;
+            return Report.Level.Unhealthy;
         }
     }
 }

@@ -17,7 +17,6 @@ import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
 import scheduler.ManualScheduler;
 import model.GeoPoint;
-import model.Level;
 import model.Robot;
 import reporting.model.Report;
 import reporting.printer.JsonReportPrinter;
@@ -250,7 +249,7 @@ public class RobotTest {
 
         Report report = mapWrittenOutputToReport(outContent);
 
-        assertEquals(Level.Moderate, report.level);
+        assertEquals(Report.Level.Moderate, report.level);
         assertEquals(ROBOT_SOURCE_NAME, report.source);
         assertEquals(41.84906d, report.location.lat, 0.00001);
         assertEquals(-87.63693d, report.location.lng, 0.00001);
@@ -277,13 +276,13 @@ public class RobotTest {
 
         Report report = reportGeneratorService.generate();
 
-        assertEquals(Level.Moderate, report.level);
+        assertEquals(Report.Level.Moderate, report.level);
 
         app.moveRobot(); // The particles reader generates 101 - which is USG level
 
         report = reportGeneratorService.generate();
 
-        assertEquals(Level.USG, report.level);
+        assertEquals(Report.Level.USG, report.level);
     }
 
     @Test
@@ -315,7 +314,7 @@ public class RobotTest {
 
         Report report = mapWrittenOutputToReport(outContent);
 
-        assertEquals(Level.Good, report.level);
+        assertEquals(Report.Level.Good, report.level);
         verify(spyParticleReader, never()).run();
 
         leaveSystemOutAsItWasBefore(originalOut, originalErr);

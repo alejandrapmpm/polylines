@@ -1,9 +1,15 @@
 package reporting.model;
 
-import model.Level;
-
 public class Report {
 
+    public enum Level {
+        Good,
+        Moderate,
+        USG,
+        Unhealthy;
+    }
+
+    //TODO do this final but need to get rid of the default constructor
     public long timestamp;
     public Location location;
     public Level level;

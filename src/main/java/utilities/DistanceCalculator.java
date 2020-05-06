@@ -6,6 +6,10 @@ public class DistanceCalculator {
 
     private static final int EARTH_RADIUS = 6371000;
 
+    private DistanceCalculator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     //result in meters
     public static double calculate(GeoPoint start, GeoPoint end) {
 
