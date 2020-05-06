@@ -16,6 +16,8 @@ import utilities.GeoPointMapper;
 public class MoveRobotApp {
 
     private static final int SPEED = 2;
+    private static ParticleReader particleReader = new ParticleReader();
+    private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
     public static void main(String [] args){
         String polyline = "mpjyHx`i@VjAVKnAh@BHHX@LZR@Bj@Ml@WWc@]w@bAyAfBmCb@o@pLeQfCsDVa@@ODQR}AJ{A?{BGuAD_@FKb@MTUX]Le@" +
@@ -29,31 +31,21 @@ public class MoveRobotApp {
         EncodedPolyline encoder = new EncodedPolyline(polyline);
         List<GeoPoint> journey = generateGeoPoints(encoder);
 
-        ParticleReader particleReader = new ParticleReader();
+        Scheduler robotScheduler = new RealScheduler(1,0,  TimeUnit.SECONDS);
+        Scheduler reportingScheduler = new RealScheduler(15 , 15, TimeUnit.MINUTES);
 
         Robot robot = new Robot(journey, SPEED);
-        RobotApplication app = new RobotApplication(robot, particleReader);
 
-        Scheduler robotScheduler = new RealScheduler(1,0,  TimeUnit.SECONDS);
-        robotScheduler.addTask(app::moveRobot);
-
-        Scheduler reportingScheduler = new RealScheduler(15 , 15, TimeUnit.MINUTES);
-        ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
+        ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, jsonReportPrinter);
         reportingScheduler.addTask(reportGenerator::generate);
+
+        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        robotScheduler.addTask(app::moveRobot);
 
         robotScheduler.start();
         reportingScheduler.start();
-
-        shutdownSchedulerIfRobotFinishedJourney(robot, robotScheduler, reportingScheduler);
     }
 
-    private static void shutdownSchedulerIfRobotFinishedJourney(Robot robot, Scheduler robotScheduler, Scheduler reportingScheduler) {
-        System.out.println("Trying to turn off the schedulers");
-        if(!robot.notArrivedYet()){
-            robotScheduler.stop();
-            reportingScheduler.stop();
-        }
-    }
 
     private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {
         GeoPointMapper mapper = new GeoPointMapper();

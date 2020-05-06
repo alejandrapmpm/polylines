@@ -2,25 +2,30 @@ package app;
 
 import model.GeoPoint;
 import model.Robot;
+import scheduler.Scheduler;
 import utilities.DistanceCalculator;
 
 public class RobotApplication {
 
     private final Robot robot;
     private final ParticleReader particleReader;
+    private final Scheduler robotScheduler;
+    private final Scheduler reportingScheduler;
     private double travelledMeters = 0;
     public int nextPosition = 1;
 
-    public RobotApplication(Robot robot, ParticleReader particleReader) {
+    public RobotApplication(Robot robot, ParticleReader particleReader, Scheduler robotScheduler, Scheduler reportingScheduler) {
         this.robot = robot;
         this.particleReader = particleReader;
+        this.robotScheduler = robotScheduler;
+        this.reportingScheduler = reportingScheduler;
     }
 
     public void moveRobot() {
-        double remainingMeters = robot.speed;
-        if (robot.notArrivedYet()) {
+        if (!robot.atTheEndOfJourney()) {
+            double remainingMeters = robot.speed;
             GeoPoint to = robot.journey.get(nextPosition);
-            while (remainingMeters > 0 && robot.notArrivedYet()) {
+            while (remainingMeters > 0 && !robot.atTheEndOfJourney()) {
                 double distance = DistanceCalculator.calculate(robot.currentPosition, to);
                 if (distance > remainingMeters) {
                     robot.currentPosition = newGeoPoint(remainingMeters, robot.currentPosition, to);
@@ -30,7 +35,7 @@ public class RobotApplication {
                     robot.currentPosition = moveToNextGeoPoint();
                     travelledMeters += distance;
                     remainingMeters -= distance;
-                    if (robot.notArrivedYet()) {
+                    if (!robot.atTheEndOfJourney()) {
                         to = robot.journey.get(nextPosition);
                     }
                 }
@@ -39,6 +44,9 @@ public class RobotApplication {
                     travelledMeters = 0;
                 }
             }
+        }
+        if(robot.atTheEndOfJourney()){
+            stopRobotAndReportingSchedulers();
         }
     }
 
@@ -53,5 +61,10 @@ public class RobotApplication {
         robot.currentPosition = robot.journey.get(nextPosition);
         nextPosition++;
         return robot.currentPosition;
+    }
+
+    private void stopRobotAndReportingSchedulers() {
+        robotScheduler.stop();
+        reportingScheduler.stop();
     }
 }

@@ -14,7 +14,8 @@ public class Robot {
         currentPosition = journey.get(0);
     }
 
-    public boolean notArrivedYet(){
-        return !currentPosition.equals(journey.get(journey.size() - 1));
+    public boolean atTheEndOfJourney(){
+        GeoPoint lastPoint = journey.get(journey.size() - 1);
+        return currentPosition.equals(lastPoint);
     }
 }

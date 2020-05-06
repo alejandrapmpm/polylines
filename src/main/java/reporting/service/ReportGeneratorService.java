@@ -47,7 +47,7 @@ public class ReportGeneratorService {
                 .mapToInt(i -> i)
                 .average()
                 .orElse(0);
-        if (average >= 0 && average <= 50) {
+        if (average <= 50) {
             return Report.Level.Good;
         } else if (average <= 100) {
             return Report.Level.Moderate;
