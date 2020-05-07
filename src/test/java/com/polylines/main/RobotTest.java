@@ -252,10 +252,10 @@ public class RobotTest {
 
         Report report = mapWrittenOutputToReport(outContent);
 
-        assertEquals(Report.Level.Moderate, report.level);
-        assertEquals(ROBOT_SOURCE_NAME, report.source);
-        assertEquals(41.84906d, report.location.lat, 0.00001);
-        assertEquals(-87.63693d, report.location.lng, 0.00001);
+        assertEquals(Report.Level.Moderate, report.getLevel());
+        assertEquals(ROBOT_SOURCE_NAME, report.getSource());
+        assertEquals(41.84906d, report.getLocation().getLat(), 0.00001);
+        assertEquals(-87.63693d, report.getLocation().getLng(), 0.00001);
 
         leaveSystemOutAsItWasBefore(originalOut, originalErr);
     }
@@ -283,25 +283,25 @@ public class RobotTest {
 
         Report report = reportGeneratorService.generate();
 
-        assertEquals(Report.Level.Good, report.level);
+        assertEquals(Report.Level.Good, report.getLevel());
 
         app.moveRobot(); // The particles reader generates 100 - which is Moderate level
 
         report = reportGeneratorService.generate();
 
-        assertEquals(Report.Level.Moderate, report.level);
+        assertEquals(Report.Level.Moderate, report.getLevel());
 
         app.moveRobot(); // The particles reader generates 150 - which is USG level
 
         report = reportGeneratorService.generate();
 
-        assertEquals(Report.Level.USG, report.level);
+        assertEquals(Report.Level.USG, report.getLevel());
 
         app.moveRobot(); // The particles reader generates 250 - which is Unhealthy level
 
         report = reportGeneratorService.generate();
 
-        assertEquals(Report.Level.Unhealthy, report.level);
+        assertEquals(Report.Level.Unhealthy, report.getLevel());
     }
 
     @Test
@@ -333,7 +333,7 @@ public class RobotTest {
 
         Report report = mapWrittenOutputToReport(outContent);
 
-        assertEquals(Report.Level.Good, report.level);
+        assertEquals(Report.Level.Good, report.getLevel());
         verify(spyParticleReader, never()).run();
 
         leaveSystemOutAsItWasBefore(originalOut, originalErr);

@@ -9,13 +9,12 @@ public class Report {
         Unhealthy;
     }
 
-    //TODO make fields final but need to get rid of the default constructor
-    public long timestamp;
-    public Location location;
-    public Level level;
-    public String source;
+    private long timestamp;
+    private Location location;
+    private Level level;
+    private String source;
 
-    public Report() {
+    private Report() {
     }
 
     public Report(long timestamp, Location location, Level level, String source) {
@@ -23,5 +22,17 @@ public class Report {
         this.location = location;
         this.level = level;
         this.source = source;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public String getSource() {
+        return source;
     }
 }
