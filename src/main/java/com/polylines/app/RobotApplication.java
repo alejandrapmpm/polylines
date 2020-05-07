@@ -2,23 +2,18 @@ package com.polylines.app;
 
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
-import com.polylines.scheduler.Scheduler;
 import com.polylines.utilities.DistanceCalculator;
 
 public class RobotApplication {
 
     private final Robot robot;
     private final ParticleReader particleReader;
-    private final Scheduler robotScheduler;
-    private final Scheduler reportingScheduler;
     private double travelledMeters = 0;
     public int nextPosition = 1;
 
-    public RobotApplication(Robot robot, ParticleReader particleReader, Scheduler robotScheduler, Scheduler reportingScheduler) {
+    public RobotApplication(Robot robot, ParticleReader particleReader) {
         this.robot = robot;
         this.particleReader = particleReader;
-        this.robotScheduler = robotScheduler;
-        this.reportingScheduler = reportingScheduler;
     }
 
     public void moveRobot() {
@@ -26,7 +21,7 @@ public class RobotApplication {
         GeoPoint to = robot.journey.get(nextPosition);
 
         while (remainingMeters > 0 && !robot.atTheEndOfJourney()) {
-            double distance = DistanceCalculator.calculate(robot.currentPosition, to);
+            double distance = DistanceCalculator.calculate(robot.getCurrentPosition(), to);
             if (distance > remainingMeters) {
                 moveToAnIntermediateStop(remainingMeters, to);
                 remainingMeters = 0;
@@ -35,16 +30,14 @@ public class RobotApplication {
                 remainingMeters -= distance;
             }
             if (travelledMeters >= 100) {
-                readParticlesInTheAir();
+                readParticlesInTheAirAndReset();
             }
-        }
-        if (robot.atTheEndOfJourney()) {
-            stopRobotAndReportingSchedulers();
         }
     }
 
     private GeoPoint moveToNextStopAndRecalculate(GeoPoint to, double distance) {
-        robot.currentPosition = moveToNextGeoPoint();
+        robot.setCurrentPosition(robot.journey.get(nextPosition));
+        nextPosition++;
         travelledMeters += distance;
         if (!robot.atTheEndOfJourney()) {
             to = robot.journey.get(nextPosition);
@@ -53,11 +46,11 @@ public class RobotApplication {
     }
 
     private void moveToAnIntermediateStop(double remainingMeters, GeoPoint to) {
-        robot.currentPosition = newGeoPoint(remainingMeters, robot.currentPosition, to);
+        robot.setCurrentPosition(newGeoPoint(remainingMeters, robot.getCurrentPosition(), to));
         travelledMeters += remainingMeters;
     }
 
-    private void readParticlesInTheAir() {
+    private void readParticlesInTheAirAndReset() {
         particleReader.run();
         travelledMeters = 0;
     }
@@ -67,16 +60,5 @@ public class RobotApplication {
         double newLat = from.lat + (to.lat - from.lat) * radio;
         double newLng = from.lng + (to.lng - from.lng) * radio;
         return new GeoPoint(newLat, newLng);
-    }
-
-    private GeoPoint moveToNextGeoPoint() {
-        robot.currentPosition = robot.journey.get(nextPosition);
-        nextPosition++;
-        return robot.currentPosition;
-    }
-
-    private void stopRobotAndReportingSchedulers() {
-        robotScheduler.stop();
-        reportingScheduler.stop();
     }
 }

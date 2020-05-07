@@ -26,6 +26,8 @@ import com.polylines.app.RobotApplication;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
+import com.polylines.observers.Observer;
+import com.polylines.observers.SchedulerObserver;
 import com.polylines.reporting.model.Report;
 import com.polylines.reporting.printer.JsonReportPrinter;
 import com.polylines.reporting.service.ReportGeneratorService;
@@ -62,8 +64,8 @@ public class RobotTest {
 
         Robot robot = new Robot(mapper.map(encoder.decodePath()), METERS_TO_MOVE);
 
-        assertEquals(41.84888, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63860, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84888, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63860, robot.getCurrentPosition().lng, 0.00001);
     }
 
     @Test(expected = RobotValidationException.class)
@@ -88,12 +90,12 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 20);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(41.84873, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63846, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84873, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63846, robot.getCurrentPosition().lng, 0.00001);
         assertEquals(1, app.nextPosition);
     }
 
@@ -108,12 +110,12 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 43);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(41.84856, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63831, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84856, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63831, robot.getCurrentPosition().lng, 0.00001);
     }
 
     @Test
@@ -131,12 +133,12 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, distance);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(41.84856, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63831, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84856, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63831, robot.getCurrentPosition().lng, 0.00001);
     }
 
     @Test
@@ -151,12 +153,12 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 1000);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(41.84906, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63693, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84906, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63693, robot.getCurrentPosition().lng, 0.00001);
     }
 
     @Test
@@ -176,18 +178,18 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 40);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(41.84858, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63832, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84858, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63832, robot.getCurrentPosition().lng, 0.00001);
         assertEquals(1, app.nextPosition);
 
         app.moveRobot();
 
-        assertEquals(41.84885, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.63810, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.84885, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.63810, robot.getCurrentPosition().lng, 0.00001);
         assertEquals(2, app.nextPosition);
     }
 
@@ -198,14 +200,14 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         robotScheduler.addTask(app::moveRobot);
 
         fire(robotScheduler);
 
-        assertEquals(41.87752, robot.currentPosition.lat, 0.00001);
-        assertEquals(-87.65967, robot.currentPosition.lng, 0.00001);
+        assertEquals(41.87752, robot.getCurrentPosition().lat, 0.00001);
+        assertEquals(-87.65967, robot.getCurrentPosition().lng, 0.00001);
 
         assertEquals(1, app.nextPosition);
     }
@@ -216,7 +218,7 @@ public class RobotTest {
         mockPolylineDecoding();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
         robotScheduler.addTask(app::moveRobot);
 
         Integer expectedRandom = 50;
@@ -243,7 +245,7 @@ public class RobotTest {
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 300);
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
@@ -273,7 +275,7 @@ public class RobotTest {
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
 
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
 
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
 
@@ -320,7 +322,7 @@ public class RobotTest {
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 99);
 
-        RobotApplication app = new RobotApplication(robot, spyParticleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, spyParticleReader);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
@@ -352,7 +354,9 @@ public class RobotTest {
         ManualScheduler spyRobotScheduler = Mockito.spy(robotScheduler);
         ManualScheduler spyReportingScheduler = Mockito.spy(reportingScheduler);
 
-        RobotApplication app = new RobotApplication(robot, particleReader, spyRobotScheduler, spyReportingScheduler);
+        registerObservers(robot, spyRobotScheduler, spyReportingScheduler);
+
+        RobotApplication app = new RobotApplication(robot, particleReader);
         spyRobotScheduler.addTask(app::moveRobot);
 
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
@@ -362,8 +366,16 @@ public class RobotTest {
         fire(reportingScheduler);
 
         assertTrue(robot.atTheEndOfJourney());
+
         verify(spyRobotScheduler).stop();
         verify(spyReportingScheduler).stop();
+    }
+
+    private void registerObservers(Robot robot, ManualScheduler spyRobotScheduler, ManualScheduler spyReportingScheduler) {
+        Observer robotObserver = new SchedulerObserver(spyRobotScheduler);
+        Observer reportingObserver = new SchedulerObserver(spyReportingScheduler);
+        robot.registerObserver(robotObserver);
+        robot.registerObserver(reportingObserver);
     }
 
     private void mockPolylineDecoding() {

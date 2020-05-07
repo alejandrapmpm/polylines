@@ -7,10 +7,10 @@ import com.polylines.model.GeoPoint;
 public class GeoPointMapper {
 
     public List<GeoPoint> map(List<LatLng> decodePath) {
-        return decodePath.stream().map(this::newGeoPoint).collect(Collectors.toList());
+        return decodePath.stream().map(this::toGeoPoint).collect(Collectors.toList());
     }
 
-    private GeoPoint newGeoPoint(LatLng latLng) {
+    private GeoPoint toGeoPoint(LatLng latLng) {
         return new GeoPoint(latLng.lat, latLng.lng);
     }
 }

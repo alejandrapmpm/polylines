@@ -39,7 +39,7 @@ public class ReportGeneratorService {
     }
 
     private Location getRobotLocation() {
-        return new Location(robot.currentPosition.lat, robot.currentPosition.lng);
+        return new Location(robot.getCurrentPosition().lat, robot.getCurrentPosition().lng);
     }
 
     private Report.Level getLevel() {

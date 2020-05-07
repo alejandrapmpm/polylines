@@ -9,6 +9,8 @@ import com.polylines.app.RobotApplication;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
+import com.polylines.observers.Observer;
+import com.polylines.observers.SchedulerObserver;
 import com.polylines.reporting.printer.JsonReportPrinter;
 import com.polylines.reporting.service.ReportGeneratorService;
 import com.polylines.scheduler.RealScheduler;
@@ -17,7 +19,7 @@ import com.polylines.utilities.GeoPointMapper;
 
 public class MoveRobotApp {
 
-    private static final int SPEED = 2;
+    private static final int SPEED = 1000;
     private static ParticleReader particleReader = new ParticleReader(new Random());
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
@@ -30,11 +32,15 @@ public class MoveRobotApp {
         Scheduler reportingScheduler = new RealScheduler(15, 15, TimeUnit.MINUTES);
 
         Robot robot = new Robot(journey, SPEED);
+        Observer robotSchedulerObserver = new SchedulerObserver(robotScheduler);
+        Observer reportingSchedulerObserver = new SchedulerObserver(reportingScheduler);
+        robot.registerObserver(robotSchedulerObserver);
+        robot.registerObserver(reportingSchedulerObserver);
 
         ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, jsonReportPrinter);
         reportingScheduler.addTask(reportGenerator::generate);
 
-        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader);
         robotScheduler.addTask(app::moveRobot);
 
         robotScheduler.start();
