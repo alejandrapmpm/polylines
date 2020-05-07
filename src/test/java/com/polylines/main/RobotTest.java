@@ -267,8 +267,8 @@ public class RobotTest {
 
         ParticleReader spyParticleReader = Mockito.spy(particleReader);
         Mockito.doReturn(50)
-                .doReturn(51)
-                .doReturn(101)
+                .doReturn(100)
+                .doReturn(150)
                 .doReturn(250)
                 .when(spyParticleReader).generateRandomInt();
 
@@ -285,13 +285,13 @@ public class RobotTest {
 
         assertEquals(Report.Level.Good, report.level);
 
-        app.moveRobot(); // The particles reader generates 51 - which is Moderate level
+        app.moveRobot(); // The particles reader generates 100 - which is Moderate level
 
         report = reportGeneratorService.generate();
 
         assertEquals(Report.Level.Moderate, report.level);
 
-        app.moveRobot(); // The particles reader generates 101 - which is USG level
+        app.moveRobot(); // The particles reader generates 150 - which is USG level
 
         report = reportGeneratorService.generate();
 

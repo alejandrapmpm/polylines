@@ -56,7 +56,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        main.MoveRobotApp
+                                        com.polylines.main.MoveRobotApp
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -93,6 +93,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.5.1</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.polylines.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.polylines.main.*</param>
+                    </targetTests>
+                    <excludedClasses>
+                        <param>com.polylines.scheduler.RealScheduler</param>
+                        <param>com.polylines.main.*</param>
+                    </excludedClasses>
+                    <timestampedReports>false</timestampedReports>
+                </configuration>
             </plugin>
         </plugins>
     </build>
