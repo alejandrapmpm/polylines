@@ -1,4 +1,4 @@
-package scheduler;
+package com.polylines.scheduler;
 
 public interface Scheduler {
 

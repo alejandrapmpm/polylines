@@ -1,4 +1,4 @@
-package exception;
+package com.polylines.exception;
 
 public class RobotValidationException extends Exception {
 

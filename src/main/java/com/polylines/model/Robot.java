@@ -1,8 +1,8 @@
-package model;
+package com.polylines.model;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
-import exception.RobotValidationException;
+import com.polylines.exception.RobotValidationException;
 
 public class Robot {
 

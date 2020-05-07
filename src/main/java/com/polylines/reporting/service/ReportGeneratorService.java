@@ -1,11 +1,11 @@
-package reporting.service;
+package com.polylines.reporting.service;
 
 import java.util.Date;
-import app.ParticleReader;
-import model.Robot;
-import reporting.model.Location;
-import reporting.model.Report;
-import reporting.printer.ReportPrinter;
+import com.polylines.app.ParticleReader;
+import com.polylines.model.Robot;
+import com.polylines.reporting.model.Location;
+import com.polylines.reporting.model.Report;
+import com.polylines.reporting.printer.ReportPrinter;
 
 public class ReportGeneratorService {
 

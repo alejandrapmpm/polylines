@@ -1,9 +1,9 @@
-package utilities;
+package com.polylines.utilities;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import com.google.maps.model.LatLng;
-import model.GeoPoint;
+import com.polylines.model.GeoPoint;
 public class GeoPointMapper {
 
     public List<GeoPoint> map(List<LatLng> decodePath) {

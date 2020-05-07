@@ -1,18 +1,18 @@
-package main;
+package com.polylines.main;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
-import app.ParticleReader;
-import app.RobotApplication;
-import exception.RobotValidationException;
-import model.GeoPoint;
-import model.Robot;
-import reporting.printer.JsonReportPrinter;
-import reporting.service.ReportGeneratorService;
-import scheduler.RealScheduler;
-import scheduler.Scheduler;
-import utilities.GeoPointMapper;
+import com.polylines.app.ParticleReader;
+import com.polylines.app.RobotApplication;
+import com.polylines.exception.RobotValidationException;
+import com.polylines.model.GeoPoint;
+import com.polylines.model.Robot;
+import com.polylines.reporting.printer.JsonReportPrinter;
+import com.polylines.reporting.service.ReportGeneratorService;
+import com.polylines.scheduler.RealScheduler;
+import com.polylines.scheduler.Scheduler;
+import com.polylines.utilities.GeoPointMapper;
 
 public class MoveRobotApp {
 

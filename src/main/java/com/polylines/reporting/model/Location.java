@@ -1,4 +1,4 @@
-package reporting.model;
+package com.polylines.reporting.model;
 
 public class Location {
 

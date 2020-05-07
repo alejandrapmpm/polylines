@@ -1,9 +1,9 @@
-package app;
+package com.polylines.app;
 
-import model.GeoPoint;
-import model.Robot;
-import scheduler.Scheduler;
-import utilities.DistanceCalculator;
+import com.polylines.model.GeoPoint;
+import com.polylines.model.Robot;
+import com.polylines.scheduler.Scheduler;
+import com.polylines.utilities.DistanceCalculator;
 
 public class RobotApplication {
 

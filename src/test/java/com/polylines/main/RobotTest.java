@@ -1,3 +1,5 @@
+package com.polylines.main;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -17,17 +19,17 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import app.ParticleReader;
-import app.RobotApplication;
-import exception.RobotValidationException;
-import model.GeoPoint;
-import model.Robot;
-import reporting.model.Report;
-import reporting.printer.JsonReportPrinter;
-import reporting.service.ReportGeneratorService;
-import scheduler.ManualScheduler;
-import utilities.DistanceCalculator;
-import utilities.GeoPointMapper;
+import com.polylines.app.ParticleReader;
+import com.polylines.app.RobotApplication;
+import com.polylines.exception.RobotValidationException;
+import com.polylines.model.GeoPoint;
+import com.polylines.model.Robot;
+import com.polylines.reporting.model.Report;
+import com.polylines.reporting.printer.JsonReportPrinter;
+import com.polylines.reporting.service.ReportGeneratorService;
+import com.polylines.scheduler.ManualScheduler;
+import com.polylines.utilities.DistanceCalculator;
+import com.polylines.utilities.GeoPointMapper;
 
 public class RobotTest {
 

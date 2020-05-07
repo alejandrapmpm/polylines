@@ -1,4 +1,4 @@
-package app;
+package com.polylines.app;
 
 import java.util.ArrayList;
 import java.util.List;

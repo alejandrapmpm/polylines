@@ -1,6 +1,6 @@
-package utilities;
+package com.polylines.utilities;
 
-import model.GeoPoint;
+import com.polylines.model.GeoPoint;
 
 public class DistanceCalculator {
 
