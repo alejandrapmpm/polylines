@@ -1,6 +1,7 @@
 package com.polylines.main;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
 import com.polylines.app.ParticleReader;
@@ -17,7 +18,7 @@ import com.polylines.utilities.GeoPointMapper;
 public class MoveRobotApp {
 
     private static final int SPEED = 2;
-    private static ParticleReader particleReader = new ParticleReader();
+    private static ParticleReader particleReader = new ParticleReader(new Random());
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
     public static void main(String[] args) throws RobotValidationException {

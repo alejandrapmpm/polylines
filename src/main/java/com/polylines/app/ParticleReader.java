@@ -6,18 +6,19 @@ import java.util.Random;
 
 public class ParticleReader {
 
-    public final List<Integer> values = new ArrayList<>();
+    public final List<Integer> values;
     private final Random random;
 
-    public ParticleReader() {
-        random = new Random();
+    public ParticleReader(Random random) {
+        this.random = random;
+        values = new ArrayList<>();
     }
 
     public void run() {
         values.add(generateRandomInt());
     }
 
-    public int generateRandomInt() {
+    private int generateRandomInt() {
         return random.nextInt(200);
     }
 

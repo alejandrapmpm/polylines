@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -33,22 +35,22 @@ import com.polylines.utilities.GeoPointMapper;
 
 public class RobotTest {
 
-    public static final JsonReportPrinter jsonPrinter = new JsonReportPrinter();
+    private static final JsonReportPrinter jsonPrinter = new JsonReportPrinter();
     private ManualScheduler robotScheduler;
-    private  ManualScheduler reportingScheduler;
+    private ManualScheduler reportingScheduler;
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
     private static final double METERS_TO_MOVE = 50;
     private static final String ROBOT_SOURCE_NAME = "ROBOT";
     private final GeoPointMapper mapper = new GeoPointMapper();
-
+    private Random mockRandom = Mockito.mock(Random.class);
 
     @Before
-    public void setup(){
+    public void setup() {
         robotScheduler = new ManualScheduler();
         reportingScheduler = new ManualScheduler();
         encoder = Mockito.mock(EncodedPolyline.class);
-        particleReader = new ParticleReader();
+        particleReader = new ParticleReader(mockRandom);
     }
 
     @Test
@@ -67,15 +69,13 @@ public class RobotTest {
     @Test(expected = RobotValidationException.class)
     public void whenThereIsOnlyOneGeoPoint_robotStaysInCurrentInitialPosition() throws RobotValidationException {
 
-       new Robot(singletonList(new GeoPoint(41.84888, -87.63860)), METERS_TO_MOVE);
-
+        new Robot(singletonList(new GeoPoint(41.84888, -87.63860)), METERS_TO_MOVE);
     }
 
     @Test(expected = RobotValidationException.class)
     public void whenEmptyGeoPoints_robotStaysInCurrentInitialPosition() throws RobotValidationException {
 
         new Robot(emptyList(), METERS_TO_MOVE);
-
     }
 
     @Test
@@ -215,13 +215,17 @@ public class RobotTest {
 
         mockPolylineDecoding();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey,  100);
+        Robot robot = new Robot(journey, 100);
         RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
         robotScheduler.addTask(app::moveRobot);
+
+        Integer expectedRandom = 50;
+        when(mockRandom.nextInt(eq(200))).thenReturn(expectedRandom);
 
         fire(robotScheduler);
 
         assertEquals(1, particleReader.values.size());
+        assertEquals(expectedRandom, particleReader.values.get(0));
     }
 
     @Test
@@ -235,15 +239,14 @@ public class RobotTest {
         mockSystemOut(outContent, errContent);
         mockPolylineDecoding();
 
-        ParticleReader spyParticleReader = Mockito.spy(particleReader);
-        Mockito.doReturn(51).when(spyParticleReader).generateRandomInt();
+        when(mockRandom.nextInt(eq(200))).thenReturn(51);
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 300);
-        RobotApplication app = new RobotApplication(robot, spyParticleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
-        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, spyParticleReader, new JsonReportPrinter());
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
         reportingScheduler.addTask(reportGeneratorService::generate);
 
         app.moveRobot();
@@ -265,19 +268,14 @@ public class RobotTest {
 
         mockDecodeLongPolyline();
 
-        ParticleReader spyParticleReader = Mockito.spy(particleReader);
-        Mockito.doReturn(50)
-                .doReturn(100)
-                .doReturn(150)
-                .doReturn(250)
-                .when(spyParticleReader).generateRandomInt();
+        when(mockRandom.nextInt(eq(200))).thenReturn(50).thenReturn(100).thenReturn(150).thenReturn(250);
 
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
 
-        RobotApplication app = new RobotApplication(robot, spyParticleReader, robotScheduler, reportingScheduler);
+        RobotApplication app = new RobotApplication(robot, particleReader, robotScheduler, reportingScheduler);
 
-        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, spyParticleReader, new JsonReportPrinter());
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
 
         app.moveRobot(); // The particles reader generates 50 - which is Moderate level
 
@@ -325,7 +323,7 @@ public class RobotTest {
         RobotApplication app = new RobotApplication(robot, spyParticleReader, robotScheduler, reportingScheduler);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
-        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, new JsonReportPrinter());
+        ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
         reportingScheduler.addTask(reportGeneratorService::generate);
 
         app.moveRobot();
@@ -360,8 +358,8 @@ public class RobotTest {
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
         spyReportingScheduler.addTask(reportGeneratorService::generate);
 
-       fire(spyRobotScheduler);
-       fire(reportingScheduler);
+        fire(spyRobotScheduler);
+        fire(reportingScheduler);
 
         assertTrue(robot.atTheEndOfJourney());
         verify(spyRobotScheduler).stop();
@@ -381,8 +379,8 @@ public class RobotTest {
     private void mockDecodeLongPolyline() {
         //7122 meters apart
         List<LatLng> points = asList(
-                new LatLng(41.87790000,-87.66001000),
-                new LatLng(41.82445000,-87.61263000)
+                new LatLng(41.87790000, -87.66001000),
+                new LatLng(41.82445000, -87.61263000)
         );
         when(encoder.decodePath()).thenReturn(points);
     }
