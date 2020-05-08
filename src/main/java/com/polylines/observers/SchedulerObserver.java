@@ -11,7 +11,6 @@ public class SchedulerObserver implements Observer {
     }
 
     public void update(){
-        System.out.println("Stoping schedulersssss");
         scheduler.stop();
     }
 }
