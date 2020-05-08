@@ -19,22 +19,30 @@ public class RobotApplication {
     }
 
     public void moveRobot() {
-        double remainingMeters = robot.speed;
+        double metersToMove = robot.speed;
         GeoPoint to = robot.journey.get(nextPosition);
 
-        while (remainingMeters > 0 && !robot.atTheEndOfJourney()) {
+        while (robotCanMove(metersToMove)) {
             double distance = DistanceCalculator.calculate(robot.getCurrentPosition(), to);
-            if (distance > remainingMeters) {
-                moveToAnIntermediateStop(remainingMeters, to);
-                remainingMeters = 0;
+            if (distance > metersToMove) {
+                moveToAnIntermediateStop(metersToMove, to);
+                metersToMove = 0;
             } else {
                 to = moveToNextStopAndRecalculate(to, distance);
-                remainingMeters -= distance;
+                metersToMove -= distance;
             }
-            if (travelledMeters >= 100) {
+            if (shouldReadParticlesLevel()) {
                 readParticlesInTheAirAndReset();
             }
         }
+    }
+
+    private boolean robotCanMove(double remainingMeters) {
+        return remainingMeters > 0 && !robot.atTheEndOfJourney();
+    }
+
+    private boolean shouldReadParticlesLevel() {
+        return travelledMeters >= 100;
     }
 
     private GeoPoint moveToNextStopAndRecalculate(GeoPoint to, double distance) {
@@ -54,7 +62,7 @@ public class RobotApplication {
 
     private void readParticlesInTheAirAndReset() {
         particleReader.run();
-        travelledMeters =  travelledMeters - 100;
+        travelledMeters = travelledMeters - 100;
     }
 
     private GeoPoint newGeoPoint(double meters, GeoPoint from, GeoPoint to) {
