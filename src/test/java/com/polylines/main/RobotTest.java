@@ -96,7 +96,7 @@ public class RobotTest {
 
         assertEquals(41.84873, robot.getCurrentPosition().lat, 0.00001);
         assertEquals(-87.63846, robot.getCurrentPosition().lng, 0.00001);
-        assertEquals(1, app.nextPosition);
+        assertEquals(1, app.getNextPosition());
     }
 
     @Test
@@ -184,13 +184,13 @@ public class RobotTest {
 
         assertEquals(41.84858, robot.getCurrentPosition().lat, 0.00001);
         assertEquals(-87.63832, robot.getCurrentPosition().lng, 0.00001);
-        assertEquals(1, app.nextPosition);
+        assertEquals(1, app.getNextPosition());
 
         app.moveRobot();
 
         assertEquals(41.84885, robot.getCurrentPosition().lat, 0.00001);
         assertEquals(-87.63810, robot.getCurrentPosition().lng, 0.00001);
-        assertEquals(2, app.nextPosition);
+        assertEquals(2, app.getNextPosition());
     }
 
     @Test
@@ -209,25 +209,27 @@ public class RobotTest {
         assertEquals(41.87752, robot.getCurrentPosition().lat, 0.00001);
         assertEquals(-87.65967, robot.getCurrentPosition().lng, 0.00001);
 
-        assertEquals(1, app.nextPosition);
+        assertEquals(1, app.getNextPosition());
     }
 
     @Test
-    public void after100Meters_shouldReadParticles() throws RobotValidationException {
+    public void each100Meters_shouldReadParticles() throws RobotValidationException {
 
-        mockPolylineDecoding();
+        mockDecodeLongPolyline();
         List<GeoPoint> journey = mapper.map(encoder.decodePath());
-        Robot robot = new Robot(journey, 100);
+        Robot robot = new Robot(journey, 40);
         RobotApplication app = new RobotApplication(robot, particleReader);
-        robotScheduler.addTask(app::moveRobot);
 
-        Integer expectedRandom = 50;
-        when(mockRandom.nextInt(eq(200))).thenReturn(expectedRandom);
-
-        fire(robotScheduler);
+        app.moveRobot();
+        app.moveRobot();
+        app.moveRobot();
 
         assertEquals(1, particleReader.values.size());
-        assertEquals(expectedRandom, particleReader.values.get(0));
+
+        app.moveRobot();
+        app.moveRobot();
+
+        assertEquals(2, particleReader.values.size());
     }
 
     @Test

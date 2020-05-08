@@ -19,7 +19,7 @@ import com.polylines.utilities.GeoPointMapper;
 
 public class MoveRobotApp {
 
-    private static final int SPEED = 1000;
+    private static final int SPEED = 2;
     private static ParticleReader particleReader = new ParticleReader(new Random());
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 

@@ -8,12 +8,14 @@ public class RobotApplication {
 
     private final Robot robot;
     private final ParticleReader particleReader;
-    private double travelledMeters = 0;
-    public int nextPosition = 1;
+    private double travelledMeters;
+    private int nextPosition;
 
     public RobotApplication(Robot robot, ParticleReader particleReader) {
         this.robot = robot;
         this.particleReader = particleReader;
+        this.travelledMeters = 0;
+        this.nextPosition = 1;
     }
 
     public void moveRobot() {
@@ -52,7 +54,7 @@ public class RobotApplication {
 
     private void readParticlesInTheAirAndReset() {
         particleReader.run();
-        travelledMeters = 0;
+        travelledMeters =  travelledMeters - 100;
     }
 
     private GeoPoint newGeoPoint(double meters, GeoPoint from, GeoPoint to) {
@@ -60,5 +62,9 @@ public class RobotApplication {
         double newLat = from.lat + (to.lat - from.lat) * radio;
         double newLng = from.lng + (to.lng - from.lng) * radio;
         return new GeoPoint(newLat, newLng);
+    }
+
+    public int getNextPosition() {
+        return nextPosition;
     }
 }
