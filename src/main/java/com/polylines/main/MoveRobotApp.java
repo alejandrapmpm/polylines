@@ -20,18 +20,18 @@ import com.polylines.utilities.GeoPointMapper;
 
 public class MoveRobotApp {
 
-    private static final int SPEED = 2;
+    private static final double SPEED = 2;
     private static ParticleReader particleReader = new RandomParticleReader(new Random());
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
     public static void main(String[] args) throws RobotValidationException {
 
-        List<GeoPoint> journey = generateGeoPoints(new EncodedPolyline(args[0]));
+        String polyline = args[0];
+        Robot robot = new Robot(generateJourney(new EncodedPolyline(polyline)), SPEED);
 
         Scheduler robotScheduler = new RealScheduler(1, 0, TimeUnit.SECONDS);
         Scheduler reportingScheduler = new RealScheduler(15, 15, TimeUnit.MINUTES);
 
-        Robot robot = new Robot(journey, SPEED);
         robot = addSchedulersAsObservers(robot, robotScheduler, reportingScheduler);
 
         ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, jsonReportPrinter);
@@ -40,6 +40,10 @@ public class MoveRobotApp {
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
         robotScheduler.addTask(app::moveRobot);
 
+        launchApplication(robotScheduler, reportingScheduler);
+    }
+
+    private static void launchApplication(Scheduler robotScheduler, Scheduler reportingScheduler) {
         robotScheduler.start();
         reportingScheduler.start();
     }
@@ -52,7 +56,7 @@ public class MoveRobotApp {
         return robot;
     }
 
-    private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {
+    private static List<GeoPoint> generateJourney(EncodedPolyline encoder) {
         return GeoPointMapper.map(encoder.decodePath());
     }
 }
