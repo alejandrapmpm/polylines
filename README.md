@@ -30,3 +30,6 @@ The build also generates a Jacoco report for coverage.
 
 - The robot's speed is currently static. It is set to 2 m/s.
 - Please note that I'm not handling invalid polylines yet
+
+## Useful Links:
+- See polyline represented in a map: https://developers.google.com/maps/documentation/utilities/polylineutility
