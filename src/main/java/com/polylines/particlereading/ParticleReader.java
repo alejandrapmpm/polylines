@@ -1,4 +1,4 @@
-package com.polylines.app;
+package com.polylines.particlereading;
 
 import java.util.ArrayList;
 import java.util.List;

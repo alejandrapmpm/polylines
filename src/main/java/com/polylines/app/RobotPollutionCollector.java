@@ -2,16 +2,17 @@ package com.polylines.app;
 
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
+import com.polylines.particlereading.ParticleReader;
 import com.polylines.utilities.DistanceCalculator;
 
-public class RobotApplication {
+public class RobotPollutionCollector {
 
     private final Robot robot;
     private final ParticleReader particleReader;
     private double travelledMeters;
     private int nextPosition;
 
-    public RobotApplication(Robot robot, ParticleReader particleReader) {
+    public RobotPollutionCollector(Robot robot, ParticleReader particleReader) {
         this.robot = robot;
         this.particleReader = particleReader;
         this.travelledMeters = 0;

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
-import com.polylines.app.ParticleReader;
-import com.polylines.app.RobotApplication;
+import com.polylines.particlereading.ParticleReader;
+import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
@@ -24,27 +24,31 @@ public class MoveRobotApp {
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
     public static void main(String[] args) throws RobotValidationException {
-        String polyline = args[0];
 
-        List<GeoPoint> journey = generateGeoPoints(new EncodedPolyline(polyline));
+        List<GeoPoint> journey = generateGeoPoints(new EncodedPolyline(args[0]));
 
         Scheduler robotScheduler = new RealScheduler(1, 0, TimeUnit.SECONDS);
         Scheduler reportingScheduler = new RealScheduler(15, 15, TimeUnit.MINUTES);
 
         Robot robot = new Robot(journey, SPEED);
-        Observer robotSchedulerObserver = new SchedulerObserver(robotScheduler);
-        Observer reportingSchedulerObserver = new SchedulerObserver(reportingScheduler);
-        robot.registerObserver(robotSchedulerObserver);
-        robot.registerObserver(reportingSchedulerObserver);
+        robot = addSchedulersAsObservers(robot, robotScheduler, reportingScheduler);
 
         ReportGeneratorService reportGenerator = new ReportGeneratorService(robot, particleReader, jsonReportPrinter);
         reportingScheduler.addTask(reportGenerator::generate);
 
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
         robotScheduler.addTask(app::moveRobot);
 
         robotScheduler.start();
         reportingScheduler.start();
+    }
+
+    private static Robot addSchedulersAsObservers(Robot robot, Scheduler robotScheduler, Scheduler reportingScheduler) {
+        Observer robotSchedulerObserver = new SchedulerObserver(robotScheduler);
+        Observer reportingSchedulerObserver = new SchedulerObserver(reportingScheduler);
+        robot.registerObserver(robotSchedulerObserver);
+        robot.registerObserver(reportingSchedulerObserver);
+        return robot;
     }
 
     private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {

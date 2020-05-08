@@ -18,8 +18,8 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.app.ParticleReader;
-import com.polylines.app.RobotApplication;
+import com.polylines.particlereading.ParticleReader;
+import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
@@ -59,7 +59,7 @@ public class ReportingGeneratorTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
@@ -89,7 +89,7 @@ public class ReportingGeneratorTest {
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
 
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
 
@@ -136,7 +136,7 @@ public class ReportingGeneratorTest {
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 99);
 
-        RobotApplication app = new RobotApplication(robot, spyParticleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, spyParticleReader);
 
         ManualScheduler reportingScheduler = new ManualScheduler();
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);

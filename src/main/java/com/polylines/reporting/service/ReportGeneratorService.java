@@ -1,7 +1,7 @@
 package com.polylines.reporting.service;
 
 import java.util.Date;
-import com.polylines.app.ParticleReader;
+import com.polylines.particlereading.ParticleReader;
 import com.polylines.model.Robot;
 import com.polylines.reporting.model.Location;
 import com.polylines.reporting.model.Report;

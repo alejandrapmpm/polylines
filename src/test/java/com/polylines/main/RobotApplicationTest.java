@@ -15,8 +15,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.app.ParticleReader;
-import com.polylines.app.RobotApplication;
+import com.polylines.particlereading.ParticleReader;
+import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
@@ -54,7 +54,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 200);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
@@ -71,7 +71,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 210);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
@@ -94,7 +94,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, distance);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
@@ -111,7 +111,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 1000);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
@@ -127,7 +127,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 40);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
@@ -147,7 +147,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         robotScheduler.addTask(app::moveRobot);
 
@@ -165,7 +165,7 @@ public class RobotApplicationTest {
 
         List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 40);
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         //Moving 120 meters in total
         app.moveRobot();
@@ -195,7 +195,7 @@ public class RobotApplicationTest {
 
         registerObservers(robot, spyRobotScheduler, spyReportingScheduler);
 
-        RobotApplication app = new RobotApplication(robot, particleReader);
+        RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
         spyRobotScheduler.addTask(app::moveRobot);
 
         ReportGeneratorService reportGeneratorService = new ReportGeneratorService(robot, particleReader, jsonPrinter);
