@@ -12,7 +12,7 @@ public class Robot implements Observable {
     public final double speed;
     private GeoPoint currentPosition;
     private final List<Observer> observers;
-    public static final String source = "ROBOT";
+    public static final String SOURCE = "ROBOT";
     private static final String NOT_VALID_JOURNEY = "The journey should have more than one point.";
 
     public Robot(List<GeoPoint> journey, double speed) throws RobotValidationException {

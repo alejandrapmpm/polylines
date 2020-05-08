@@ -31,7 +31,7 @@ public class ReportGeneratorService {
                 getCurrentTimestamp(),
                 getRobotLocation(),
                 getLevel(),
-                Robot.source);
+                Robot.SOURCE);
     }
 
     private long getCurrentTimestamp() {
