@@ -131,6 +131,7 @@ public class RobotTest {
 
         GeoPoint secondPoint = journey.get(1);
         assertEquals(secondPoint, robot.getCurrentPosition());
+        assertEquals(2, app.getNextPosition());
     }
 
     @Test
