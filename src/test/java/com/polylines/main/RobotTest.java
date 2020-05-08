@@ -42,10 +42,9 @@ public class RobotTest {
     private ManualScheduler reportingScheduler;
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
+    private Random mockRandom = Mockito.mock(Random.class);
     private static final double METERS_TO_MOVE = 50;
     private static final String ROBOT_SOURCE_NAME = "ROBOT";
-    private final GeoPointMapper mapper = new GeoPointMapper();
-    private Random mockRandom = Mockito.mock(Random.class);
 
     @Before
     public void setup() {
@@ -62,7 +61,7 @@ public class RobotTest {
                 new LatLng(41.84888, -87.63860),
                 new LatLng(41.84856, -87.63831)));
 
-        Robot robot = new Robot(mapper.map(encoder.decodePath()), METERS_TO_MOVE);
+        Robot robot = new Robot(GeoPointMapper.map(encoder.decodePath()), METERS_TO_MOVE);
 
         assertEquals(41.84888, robot.getCurrentPosition().lat, 0.00001);
         assertEquals(-87.63860, robot.getCurrentPosition().lng, 0.00001);
@@ -88,7 +87,7 @@ public class RobotTest {
                 new LatLng(41.84888, -87.63860),
                 new LatLng(41.84856, -87.63831)));
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 20);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -108,7 +107,7 @@ public class RobotTest {
                 new LatLng(41.84888, -87.63860),
                 new LatLng(41.84856, -87.63831)));
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 43);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -131,7 +130,7 @@ public class RobotTest {
                 new GeoPoint(41.84888, -87.63860),
                 new GeoPoint(41.84856, -87.63831)); //TODO - Revisit calculation for easier use when mocking
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, distance);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -151,7 +150,7 @@ public class RobotTest {
             */
         mockPolylineDecoding();
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 1000);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -176,7 +175,7 @@ public class RobotTest {
 
         mockPolylineDecoding();
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 40);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -198,7 +197,7 @@ public class RobotTest {
 
         mockDecodeLongPolyline();
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, METERS_TO_MOVE);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -216,7 +215,7 @@ public class RobotTest {
     public void each100Meters_shouldReadParticles() throws RobotValidationException {
 
         mockDecodeLongPolyline();
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 40);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -245,7 +244,7 @@ public class RobotTest {
 
         when(mockRandom.nextInt(eq(200))).thenReturn(51);
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 300);
         RobotApplication app = new RobotApplication(robot, particleReader);
 
@@ -274,7 +273,7 @@ public class RobotTest {
 
         when(mockRandom.nextInt(eq(200))).thenReturn(50).thenReturn(100).thenReturn(150).thenReturn(250);
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 100);
 
         RobotApplication app = new RobotApplication(robot, particleReader);
@@ -320,8 +319,7 @@ public class RobotTest {
 
         ParticleReader spyParticleReader = Mockito.spy(particleReader);
 
-        GeoPointMapper mapper = new GeoPointMapper();
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 99);
 
         RobotApplication app = new RobotApplication(robot, spyParticleReader);
@@ -350,7 +348,7 @@ public class RobotTest {
                 new LatLng(41.84888, -87.63860),
                 new LatLng(41.84856, -87.63831)));
 
-        List<GeoPoint> journey = mapper.map(encoder.decodePath());
+        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
         Robot robot = new Robot(journey, 43);
 
         ManualScheduler spyRobotScheduler = Mockito.spy(robotScheduler);

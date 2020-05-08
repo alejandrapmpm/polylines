@@ -48,7 +48,6 @@ public class MoveRobotApp {
     }
 
     private static List<GeoPoint> generateGeoPoints(EncodedPolyline encoder) {
-        GeoPointMapper mapper = new GeoPointMapper();
-        return mapper.map(encoder.decodePath());
+        return GeoPointMapper.map(encoder.decodePath());
     }
 }
