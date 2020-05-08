@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import com.google.maps.model.EncodedPolyline;
-import com.polylines.particlereading.ParticleReader;
 import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
 import com.polylines.observers.Observer;
 import com.polylines.observers.SchedulerObserver;
+import com.polylines.particlereading.ParticleReader;
+import com.polylines.particlereading.RandomParticleReader;
 import com.polylines.reporting.printer.JsonReportPrinter;
 import com.polylines.reporting.service.ReportGeneratorService;
 import com.polylines.scheduler.RealScheduler;
@@ -20,7 +21,7 @@ import com.polylines.utilities.GeoPointMapper;
 public class MoveRobotApp {
 
     private static final int SPEED = 2;
-    private static ParticleReader particleReader = new ParticleReader(new Random());
+    private static ParticleReader particleReader = new RandomParticleReader(new Random());
     private static JsonReportPrinter jsonReportPrinter = new JsonReportPrinter();
 
     public static void main(String[] args) throws RobotValidationException {

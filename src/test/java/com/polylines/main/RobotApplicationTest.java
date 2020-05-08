@@ -15,13 +15,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.particlereading.ParticleReader;
 import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
 import com.polylines.observers.Observer;
 import com.polylines.observers.SchedulerObserver;
+import com.polylines.particlereading.RandomParticleReader;
 import com.polylines.reporting.printer.JsonReportPrinter;
 import com.polylines.reporting.service.ReportGeneratorService;
 import com.polylines.scheduler.ManualScheduler;
@@ -33,7 +33,7 @@ public class RobotApplicationTest {
     private static final JsonReportPrinter jsonPrinter = new JsonReportPrinter();
     private ManualScheduler robotScheduler;
     private ManualScheduler reportingScheduler;
-    private ParticleReader particleReader;
+    private RandomParticleReader particleReader;
     private EncodedPolyline encoder;
     private Random mockRandom = Mockito.mock(Random.class);
     private static final double METERS_TO_MOVE = 50;
@@ -43,7 +43,7 @@ public class RobotApplicationTest {
         robotScheduler = new ManualScheduler();
         reportingScheduler = new ManualScheduler();
         encoder = Mockito.mock(EncodedPolyline.class);
-        particleReader = new ParticleReader(mockRandom);
+        particleReader = new RandomParticleReader(mockRandom);
     }
 
     @Test

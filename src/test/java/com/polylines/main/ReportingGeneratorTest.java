@@ -18,11 +18,12 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.particlereading.ParticleReader;
 import com.polylines.app.RobotPollutionCollector;
 import com.polylines.exception.RobotValidationException;
 import com.polylines.model.GeoPoint;
 import com.polylines.model.Robot;
+import com.polylines.particlereading.ParticleReader;
+import com.polylines.particlereading.RandomParticleReader;
 import com.polylines.reporting.model.Report;
 import com.polylines.reporting.printer.JsonReportPrinter;
 import com.polylines.reporting.service.ReportGeneratorService;
@@ -40,7 +41,7 @@ public class ReportingGeneratorTest {
     @Before
     public void setup() {
         encoder = Mockito.mock(EncodedPolyline.class);
-        particleReader = new ParticleReader(mockRandom);
+        particleReader = new RandomParticleReader(mockRandom);
     }
 
     @Test

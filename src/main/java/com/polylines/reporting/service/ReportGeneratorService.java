@@ -1,8 +1,8 @@
 package com.polylines.reporting.service;
 
 import java.util.Date;
-import com.polylines.particlereading.ParticleReader;
 import com.polylines.model.Robot;
+import com.polylines.particlereading.ParticleReader;
 import com.polylines.reporting.model.Location;
 import com.polylines.reporting.model.Report;
 import com.polylines.reporting.printer.ReportPrinter;
@@ -22,7 +22,7 @@ public class ReportGeneratorService {
     public Report generate() {
         Report report = buildReport();
         printer.print(report);
-        particleReader.removePreviousReadings();
+        particleReader.clearPreviousReadings();
         return report;
     }
 
@@ -43,7 +43,7 @@ public class ReportGeneratorService {
     }
 
     private Report.Level getLevel() {
-        double average = particleReader.values.stream()
+        double average = particleReader.getReadings().stream()
                 .mapToInt(i -> i)
                 .average()
                 .orElse(0);

@@ -1,28 +1,11 @@
 package com.polylines.particlereading;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+public interface ParticleReader {
 
-public class ParticleReader {
+    void run();
 
-    public final List<Integer> values;
-    private final Random random;
+    void clearPreviousReadings();
 
-    public ParticleReader(Random random) {
-        this.random = random;
-        values = new ArrayList<>();
-    }
-
-    public void run() {
-        values.add(generateRandomInt());
-    }
-
-    private int generateRandomInt() {
-        return random.nextInt(200);
-    }
-
-    public void removePreviousReadings() {
-        values.clear();
-    }
+    List<Integer> getReadings();
 }
