@@ -8,13 +8,12 @@ public class RandomParticleReader implements ParticleReader {
 
     public final List<Integer> values;
     private final Random random;
-    private static final int BOUND = 200;
+    private static final int UPPER_BOUND = 200;
 
     public RandomParticleReader(Random random) {
         this.random = random;
         values = new ArrayList<>();
     }
-
 
     @Override
     public void run() {
@@ -32,6 +31,6 @@ public class RandomParticleReader implements ParticleReader {
     }
 
     private int generateRandomInt() {
-        return random.nextInt(BOUND);
+        return random.nextInt(UPPER_BOUND);
     }
 }

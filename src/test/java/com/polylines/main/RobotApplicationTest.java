@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,14 +36,14 @@ public class RobotApplicationTest {
     private ManualScheduler reportingScheduler;
     private RandomParticleReader particleReader;
     private EncodedPolyline encoder;
-    private Random mockRandom = Mockito.mock(Random.class);
+    private Random mockRandom = mock(Random.class);
     private static final double METERS_TO_MOVE = 50;
 
     @Before
     public void setup() {
         robotScheduler = new ManualScheduler();
         reportingScheduler = new ManualScheduler();
-        encoder = Mockito.mock(EncodedPolyline.class);
+        encoder = mock(EncodedPolyline.class);
         particleReader = new RandomParticleReader(mockRandom);
     }
 

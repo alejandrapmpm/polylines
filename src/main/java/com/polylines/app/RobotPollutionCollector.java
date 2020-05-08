@@ -20,7 +20,7 @@ public class RobotPollutionCollector {
     }
 
     public void moveRobot() {
-        double metersToMove = robot.speed;
+        double metersToMove = robot.getSpeed();
         GeoPoint to = robot.journey.get(nextPosition);
 
         while (robotCanMove(metersToMove)) {

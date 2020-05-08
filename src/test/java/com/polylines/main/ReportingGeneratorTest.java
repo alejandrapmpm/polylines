@@ -3,6 +3,7 @@ package com.polylines.main;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,12 +36,12 @@ public class ReportingGeneratorTest {
     private static final JsonReportPrinter jsonPrinter = new JsonReportPrinter();
     private ParticleReader particleReader;
     private EncodedPolyline encoder;
-    private Random mockRandom = Mockito.mock(Random.class);
+    private Random mockRandom = mock(Random.class);
     private static final String ROBOT_SOURCE_NAME = "ROBOT";
 
     @Before
     public void setup() {
-        encoder = Mockito.mock(EncodedPolyline.class);
+        encoder = mock(EncodedPolyline.class);
         particleReader = new RandomParticleReader(mockRandom);
     }
 

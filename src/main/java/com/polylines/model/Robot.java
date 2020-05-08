@@ -1,5 +1,7 @@
 package com.polylines.model;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
@@ -9,14 +11,14 @@ import com.polylines.observers.Observer;
 public class Robot implements Observable {
 
     public final List<GeoPoint> journey;
-    public final double speed;
+    private final double speed;
     private GeoPoint currentPosition;
     private final List<Observer> observers;
     public static final String SOURCE = "ROBOT";
     private static final String NOT_VALID_JOURNEY = "The journey should have more than one point.";
 
     public Robot(List<GeoPoint> journey, double speed) throws RobotValidationException {
-        if (CollectionUtils.isEmpty(journey) || journey.size() == 1) {
+        if (isEmpty(journey) || journey.size() == 1) {
             throw new RobotValidationException(NOT_VALID_JOURNEY);
         }
         this.journey = journey;
@@ -49,5 +51,9 @@ public class Robot implements Observable {
     @Override
     public void notifyAllObservers() {
         observers.forEach(Observer::update);
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 }
