@@ -10,10 +10,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.exception.RobotValidationException;
-import com.polylines.model.GeoPoint;
-import com.polylines.model.Robot;
-import com.polylines.utilities.GeoPointMapper;
+import com.polylines.domain.robot.RobotValidationException;
+import com.polylines.domain.robot.GeoPoint;
+import com.polylines.domain.robot.Robot;
+import com.polylines.infraestructure.GeoPointMapper;
 
 public class RobotCreationTest {
 

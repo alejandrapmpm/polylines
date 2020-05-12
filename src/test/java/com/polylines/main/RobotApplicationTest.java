@@ -16,18 +16,18 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.google.maps.model.EncodedPolyline;
 import com.google.maps.model.LatLng;
-import com.polylines.app.RobotPollutionCollector;
-import com.polylines.exception.RobotValidationException;
-import com.polylines.model.GeoPoint;
-import com.polylines.model.Robot;
-import com.polylines.observers.Observer;
-import com.polylines.observers.SchedulerObserver;
-import com.polylines.particlereading.RandomParticleReader;
-import com.polylines.reporting.printer.JsonReportPrinter;
-import com.polylines.reporting.service.ReportGeneratorService;
-import com.polylines.scheduler.ManualScheduler;
-import com.polylines.utilities.DistanceCalculator;
-import com.polylines.utilities.GeoPointMapper;
+import com.polylines.application.moverobot.RobotPollutionCollector;
+import com.polylines.domain.robot.RobotValidationException;
+import com.polylines.domain.robot.GeoPoint;
+import com.polylines.domain.robot.Robot;
+import com.polylines.domain.observers.Observer;
+import com.polylines.domain.observers.SchedulerObserver;
+import com.polylines.application.readparticles.RandomParticleReader;
+import com.polylines.infraestructure.reportprinting.JsonReportPrinter;
+import com.polylines.application.generatereport.ReportGeneratorService;
+import com.polylines.application.scheduler.ManualScheduler;
+import com.polylines.infraestructure.DistanceCalculator;
+import com.polylines.infraestructure.GeoPointMapper;
 
 public class RobotApplicationTest {
 
