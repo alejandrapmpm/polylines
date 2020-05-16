@@ -1,6 +1,7 @@
 package com.polylines.application.moverobot;
 
 import com.polylines.domain.robot.GeoPoint;
+import com.polylines.domain.robot.GeoPointBuilder;
 import com.polylines.domain.robot.Robot;
 import com.polylines.domain.particlesreading.ParticleReader;
 import com.polylines.infraestructure.DistanceCalculator;
@@ -70,7 +71,7 @@ public class RobotPollutionCollector {
         double radio = meters / DistanceCalculator.calculate(from, to);
         double newLat = from.lat + (to.lat - from.lat) * radio;
         double newLng = from.lng + (to.lng - from.lng) * radio;
-        return new GeoPoint(newLat, newLng);
+        return GeoPointBuilder.aGeoPoint(newLat, newLng);
     }
 
     public int getNextPosition() {

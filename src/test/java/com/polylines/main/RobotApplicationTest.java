@@ -1,5 +1,6 @@
 package com.polylines.main;
 
+import static com.polylines.domain.robot.GeoPointBuilder.aGeoPoint;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,27 +8,24 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import com.google.maps.model.EncodedPolyline;
-import com.google.maps.model.LatLng;
+import com.polylines.application.generatereport.ReportGeneratorService;
 import com.polylines.application.moverobot.RobotPollutionCollector;
-import com.polylines.domain.robot.RobotValidationException;
-import com.polylines.domain.robot.GeoPoint;
-import com.polylines.domain.robot.Robot;
+import com.polylines.application.readparticles.RandomParticleReader;
+import com.polylines.application.scheduler.ManualScheduler;
 import com.polylines.domain.observers.Observer;
 import com.polylines.domain.observers.SchedulerObserver;
-import com.polylines.application.readparticles.RandomParticleReader;
-import com.polylines.infraestructure.reportprinting.JsonReportPrinter;
-import com.polylines.application.generatereport.ReportGeneratorService;
-import com.polylines.application.scheduler.ManualScheduler;
+import com.polylines.domain.robot.GeoPoint;
+import com.polylines.domain.robot.Robot;
+import com.polylines.domain.robot.RobotValidationException;
 import com.polylines.infraestructure.DistanceCalculator;
-import com.polylines.infraestructure.GeoPointMapper;
+import com.polylines.infraestructure.reportprinting.JsonReportPrinter;
 
 public class RobotApplicationTest {
 
@@ -35,31 +33,29 @@ public class RobotApplicationTest {
     private ManualScheduler robotScheduler;
     private ManualScheduler reportingScheduler;
     private RandomParticleReader particleReader;
-    private EncodedPolyline encoder;
     private Random mockRandom = mock(Random.class);
     private static final double METERS_TO_MOVE = 50;
+    private List<GeoPoint> journey;
 
     @Before
     public void setup() {
         robotScheduler = new ManualScheduler();
         reportingScheduler = new ManualScheduler();
-        encoder = mock(EncodedPolyline.class);
         particleReader = new RandomParticleReader(mockRandom);
+        journey = new ArrayList<>();
     }
 
     @Test
     public void whenMetersToMoveAreLessThanDistanceToNextGeoPoint_robotEndsInAnIntermediateGeoPoint()
             throws RobotValidationException {
 
-        mockPolylineWithOnlyTwoPoints7000MetersApart();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithTwoPoints7000MetersApart();
         Robot robot = new Robot(journey, 200);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
-        GeoPoint initialPosition = journey.get(0);
+        GeoPoint initialPosition = this.journey.get(0);
         assertNotEquals(initialPosition, robot.getCurrentPosition());
         assertEquals(1, app.getNextPosition());
     }
@@ -68,9 +64,7 @@ public class RobotApplicationTest {
     public void whenMetersToMoveAreFurtherThanNextGeoPoint_andNoGeoPointsLeft_robotEndsInLastGeoPoint()
             throws RobotValidationException {
 
-        mockPolyLineWithFourPointsWithATotalDistanceOf200Meters();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithFourPointsWithATotalDistanceOf200Meters();
         Robot robot = new Robot(journey, 210);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
@@ -85,15 +79,13 @@ public class RobotApplicationTest {
     public void whenMetersToMoveAreExactlyTheDistanceBetweenTwoGeoPoints_robotEndsInTheSecondGeoPoint()
             throws RobotValidationException {
 
-        when(encoder.decodePath()).thenReturn(asList(
-                new LatLng(41.84888, -87.63860),
-                new LatLng(41.84856, -87.63831)));
-
         double distance = DistanceCalculator.calculate(
-                new GeoPoint(41.84888, -87.63860),
-                new GeoPoint(41.84856, -87.63831)); //TODO - Need a better way to mock distances
+                aGeoPoint(41.84888, -87.63860),
+                aGeoPoint(41.84856, -87.63831)); //TODO - Need a better way to mock distances
 
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = asList(
+                aGeoPoint(41.84888, -87.63860),
+                aGeoPoint(41.84856, -87.63831));
         Robot robot = new Robot(journey, distance);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
@@ -108,9 +100,7 @@ public class RobotApplicationTest {
     public void whenMetersToMoveIsGreaterThanTheSumOfAllDistancesInTheJourney_robotMovesEndsInLastGeoPoint()
             throws RobotValidationException {
 
-        mockPolyLineWithFourPointsWithATotalDistanceOf200Meters();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithFourPointsWithATotalDistanceOf200Meters();
         Robot robot = new Robot(journey, 1000);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
@@ -124,29 +114,25 @@ public class RobotApplicationTest {
     @Test
     public void movingTwiceTheRobot_shouldMoveRobotAlongPolyline() throws RobotValidationException {
 
-        mockPolyLineWithFourPointsWithATotalDistanceOf200Meters();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithFourPointsWithATotalDistanceOf200Meters();
         Robot robot = new Robot(journey, 40);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.84858184958813, -87.63832980118924), robot.getCurrentPosition());
+        assertEquals(aGeoPoint(41.84858184958813, -87.63832980118924), robot.getCurrentPosition());
         assertEquals(1, app.getNextPosition());
 
         app.moveRobot();
 
-        assertEquals(new GeoPoint(41.848857314177536, -87.63810757332594), robot.getCurrentPosition());
+        assertEquals(aGeoPoint(41.848857314177536, -87.63810757332594), robot.getCurrentPosition());
         assertEquals(2, app.getNextPosition());
     }
 
     @Test
     public void whenRobotSchedulerFires_robotShouldMoveFromCurrentPositionToAnotherPoint() throws RobotValidationException {
 
-        mockPolyLineWithFourPointsWithATotalDistanceOf200Meters();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithFourPointsWithATotalDistanceOf200Meters();
         Robot robot = new Robot(journey, METERS_TO_MOVE);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
@@ -162,9 +148,7 @@ public class RobotApplicationTest {
     @Test
     public void each100Meters_shouldReadParticles() throws RobotValidationException {
 
-        mockPolylineWithOnlyTwoPoints7000MetersApart();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithTwoPoints7000MetersApart();
         Robot robot = new Robot(journey, 40);
         RobotPollutionCollector app = new RobotPollutionCollector(robot, particleReader);
 
@@ -186,9 +170,7 @@ public class RobotApplicationTest {
     public void whenRobotHasArrivedToLastPosition_robotSchedulerAndReportingSchedulerShouldStop()
             throws RobotValidationException {
 
-        mockPolyLineWithFourPointsWithATotalDistanceOf200Meters();
-
-        List<GeoPoint> journey = GeoPointMapper.map(encoder.decodePath());
+        List<GeoPoint> journey = aJourneyWithFourPointsWithATotalDistanceOf200Meters();
         Robot robot = new Robot(journey, 250);
 
         ManualScheduler spyRobotScheduler = Mockito.spy(robotScheduler);
@@ -218,32 +200,29 @@ public class RobotApplicationTest {
         robot.registerObserver(reportingObserver);
     }
 
-    private void mockPolyLineWithFourPointsWithATotalDistanceOf200Meters() {
-         /*     String polyline = "orl~Ff|{uO~@y@}A_AEsE";
+    private List<GeoPoint> aJourneyWithTwoPoints7000MetersApart() {
+        journey = asList(
+                aGeoPoint(41.87790, -87.66001),
+                aGeoPoint(41.82445, -87.61263));
+        return journey;
+    }
+
+    private List<GeoPoint> aJourneyWithFourPointsWithATotalDistanceOf200Meters() {
+                 /*     String polyline = "orl~Ff|{uO~@y@}A_AEsE";
                 Distance is: 42.93135105797141
                 Distance is: 58.59883353809855
                 Distance is: 87.86280526271533
-                Point 1: 41.84888, -87.63860000000001),
+                Point 1: 41.84888, -87.638600),
                 Point 2: 41.84856, -87.63831),
                 Point 3: 41.84903, -87.63799),
                 Point 4: (41.84906, -87.63693)
          */
-        List<LatLng> points = asList(
-                new LatLng(41.84888, -87.63860000000001),
-                new LatLng(41.84856, -87.63831),
-                new LatLng(41.84903, -87.63799),
-                new LatLng(41.84906, -87.63693)
-        );
-        when(encoder.decodePath()).thenReturn(points);
-    }
-
-    private void mockPolylineWithOnlyTwoPoints7000MetersApart() {
-        //7122 meters apart
-        List<LatLng> points = asList(
-                new LatLng(41.87790000, -87.66001000),
-                new LatLng(41.82445000, -87.61263000)
-        );
-        when(encoder.decodePath()).thenReturn(points);
+        journey = asList(
+                aGeoPoint(41.84888, -87.63860),
+                aGeoPoint(41.84856, -87.63831),
+                aGeoPoint(41.84903, -87.63799),
+                aGeoPoint(41.84906, -87.63693));
+        return journey;
     }
 
     private void fire(ManualScheduler timer) {
